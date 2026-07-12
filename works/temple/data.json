@@ -1,0 +1,140 @@
+{
+  "version": "1.0",
+  "id": "temple",
+  "title": "なぞ遺跡からの脱出",
+  "author": "ねぎ",
+  "difficulty": 3,
+  "time": "30〜45分",
+  "titleImage": "title.png",
+  "ogpImage": "ogp.png",
+  "supportButtonText": "気付く",
+  "supportThinkingImage": "thinking.png",
+  "intro": "しまった！！！！うっかりして遺跡に迷い込んでしまった！！\n脱出するためには4つのなぞを解かなければならないみたいだ。",
+  "howToPlay": "回答するときはひらがなで入力してください。\n\n行き詰まったときは「気付く」ボタンを押してみましょう。\n\nまだ見つけていない新しい何かに、なぞねぎが気付くかもしれません。",
+  "notice": [
+    "配信OK",
+    "ソースコードを見ないと解けない謎は一切ありません。"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "label": "Q1",
+      "image": "q1.png",
+      "placeholder": "ひらがなで入力",
+      "answers": [
+        "ほこさき"
+      ],
+      "successMessage": "答えは「ほこさき」次の問題へいこう！",
+      "notices": [
+        {
+          "type": "image",
+          "content": "q1_notice1.png"
+        },
+        {
+          "type": "image",
+          "content": "q1_notice2.png"
+        },
+        {
+          "type": "image",
+          "content": "q1_notice3.png"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "label": "Q2",
+      "image": "q2.png",
+      "placeholder": "むなしい状態が答え、ひらがなで入力",
+      "answers": [
+        "くうきょ"
+      ],
+      "successMessage": "答えは「くうきょ（空虚）」次の問題へいこう！",
+      "notices": [
+        {
+          "type": "image",
+          "content": "q2_notice1.png"
+        },
+        {
+          "type": "text",
+          "content": "かでんには「くうきせいじょうき」が入りそうかも"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "label": "Q3",
+      "image": "q3.png",
+      "placeholder": "ひらがなで入力",
+      "answers": [
+        "しょくじ"
+      ],
+      "successMessage": "答えは「しょくじ」次の問題へいこう！",
+      "notices": [
+        {
+          "type": "text",
+          "content": "5文字の甘い野菜といえば「さつまいも」かな？"
+        },
+        {
+          "type": "text",
+          "content": "「本」「紙」「文字」の数え方が「さつ」「まい」「も（じ）」に一致しそう！"
+        },
+        {
+          "type": "text",
+          "content": "色の数え方？？１〇、2〇、3〇"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "label": "Q4",
+      "image": "q4.png",
+      "placeholder": "ひらがなで入力",
+      "answers": [
+        "しんこう"
+      ],
+      "successMessage": "答えは「しんこう」最後の問題へいこう！",
+      "notices": [
+        {
+          "type": "text",
+          "content": "しゅき→きゅうり→りんご→ごーや でしりとりで一周できそう"
+        },
+        {
+          "type": "text",
+          "content": "ごーや→？？？？→しゅき　で4文字で丸の中に使えそうなものないかな？"
+        }
+      ]
+    },
+    {
+      "id": "last",
+      "label": "LAST",
+      "image": "last.png",
+      "placeholder": "送るものが答え、ひらがなで入力",
+      "answers": [
+        "さんじ"
+      ],
+      "notices": [
+        {
+          "type": "text",
+          "content": "Q１の「けがれたたましい」に触れてみよう"
+        },
+        {
+          "type": "text",
+          "content": "白と黒のマス目型のパズルとは何だろう"
+        },
+        {
+          "type": "text",
+          "content": "クロスワードを埋めたときに「このめ」の位置に対応する3文字が答えか"
+        },
+        {
+          "type": "text",
+          "content": "「さんじ」って三時？でも答えは送るものだから。。。「さんじ」をおくる？"
+        }
+      ]
+    }
+  ],
+  "ending": {
+    "image": "clear.png",
+    "text": "石像に賛辞を送ると、石像は喜びなぞねぎを外へと出してくれた。\n\nなぞねぎは感謝して遺跡を大爆発した。脱出成功！",
+    "tweetText": "ねぎなぞ『遺跡からの脱出』をクリア！\n無事爆破できた！\n#ねぎなぞ脱出 #謎解き #WEB謎"
+  }
+}

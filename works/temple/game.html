@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>loading...</title>
+  <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="temple.css">
+</head>
+
+<body>
+  <main class="container game">
+    <section class="card">
+      <div class="question-header">
+        <h1 id="questionLabel" class="qlabel"></h1>
+        <button id="noticeButton" class="notice-link">気付く</button>
+      </div>
+      <div id="templeGridArea" class="temple-grid-area" aria-label="Q1文字マス">
+        <div id="templeLetterGrid" class="temple-letter-grid"></div>
+      </div>
+      <img id="questionImage" class="puzzle">
+      <p id="lastAnswer" class="submitted hidden"></p>
+      <nav class="pager"><button id="prevButton">◀</button>
+        <div id="stepNav"></div><button id="nextButton">▶</button>
+      </nav>
+    </section>
+    <section class="card answer">
+      <h2>答え</h2>
+      <div class="answerrow"><input id="answerInput" autocomplete="off"><button id="answerButton">決定</button></div>
+      <p id="wrongMessage" class="ng"></p>
+      <div class="resetarea"><button id="progressResetButton" class="resetlink">進捗リセット</button></div>
+    </section>
+  </main>
+  <div id="modal" class="overlay hidden">
+    <div class="modalbox"><button id="modalClose" class="close">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+  <div id="viewer" class="overlay viewer hidden"><button id="viewerClose" class="close">×</button><img id="viewerImage">
+  </div>
+  <script src="../../script.js"></script>
+  <script src="temple.js"></script>
+</body>
+
+</html>

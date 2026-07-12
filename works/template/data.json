@@ -1,0 +1,75 @@
+{
+  "version": "1.0",
+  "id": "template",
+  "title": "template",
+  "author": "ねぎ",
+  "difficulty": 2,
+  "time": "10〜20分",
+  "titleImage": "title.svg",
+  "ogpImage": "ogp.svg",
+  "supportButtonText": "気付く",
+  "supportThinkingImage": "thinking.png",
+  "intro": "ねぎなぞ脱出のテンプレート作品です。",
+  "howToPlay": "行き詰まったときは「気付く」ボタンを押してみましょう。\n\nまだ見つけていない新しい何かに、なぞねぎが気付くかもしれません。",
+  "notice": [
+    "配信OK",
+    "ソースコードを見ないと解けない謎は一切ありません。"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "label": "Q1",
+      "image": "q1.svg",
+      "answers": [
+        "あり",
+        "アリ"
+      ],
+      "successMessage": "正解！",
+      "notices": [
+        {
+          "type": "text",
+          "content": "なぞねぎは新しいことに気付いた。"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "label": "Q2",
+      "image": "q2.svg",
+      "placeholder": "ものの名前をひらがなで入力",
+      "answers": [
+        "くつ",
+        "クツ"
+      ],
+      "successMessage": "正解！",
+      "notices": [
+        {
+          "type": "image",
+          "content": "q2_notice1.svg"
+        }
+      ]
+    },
+    {
+      "id": "last",
+      "label": "LAST",
+      "image": "last.svg",
+      "answers": [
+        "くりあ",
+        "クリア",
+        "clear"
+      ],
+      "successMessage": "最後の答えにたどり着いた。",
+      "notices": [
+        {
+          "type": "text",
+          "content": "これまでの答えを見直してみよう。"
+        }
+      ]
+    }
+  ],
+  "ending": {
+    "image": "clear.svg",
+    "text": "すべての謎を解いた瞬間、なぜか施設は大爆発した。脱出成功！",
+    "tweetText": "『template』をクリア！\n無事爆破できた！\n#ねぎなぞ脱出 #謎解き"
+  }
+}
