@@ -5,12 +5,12 @@
   "author": "ねぎ",
   "difficulty": 2,
   "time": "10〜20分",
-  "titleImage": "title.svg",
-  "ogpImage": "ogp.svg",
+  "titleImage": "title.png",
+  "ogpImage": "ogp.png",
   "supportButtonText": "気付く",
   "supportThinkingImage": "thinking.png",
-  "intro": "ねぎなぞ脱出のテンプレート作品です。",
-  "howToPlay": "行き詰まったときは「気付く」ボタンを押してみましょう。\n\nまだ見つけていない新しい何かに、なぞねぎが気付くかもしれません。",
+  "intro": "しまった！！！！うっかりして遺跡に迷い込んでしまった！！\n脱出するためには4つのなぞを解かなければならないみたいだ。",
+  "howToPlay": "回答するときはひらがなで入力してください。\n\n行き詰まったときは「気付く」ボタンを押してみましょう。\n\nまだ見つけていない新しい何かに、なぞねぎが気付くかもしれません。",
   "notice": [
     "配信OK",
     "ソースコードを見ないと解けない謎は一切ありません。"
@@ -19,7 +19,7 @@
     {
       "id": "q1",
       "label": "Q1",
-      "image": "q1.svg",
+      "image": "q1.png",
       "answers": [
         "あり",
         "アリ"
@@ -35,7 +35,7 @@
     {
       "id": "q2",
       "label": "Q2",
-      "image": "q2.svg",
+      "image": "q2.png",
       "placeholder": "ものの名前をひらがなで入力",
       "answers": [
         "くつ",
@@ -45,14 +45,14 @@
       "notices": [
         {
           "type": "image",
-          "content": "q2_notice1.svg"
+          "content": "q2_notice1.png"
         }
       ]
     },
     {
       "id": "last",
       "label": "LAST",
-      "image": "last.svg",
+      "image": "last.png",
       "answers": [
         "くりあ",
         "クリア",
@@ -68,8 +68,8 @@
     }
   ],
   "ending": {
-    "image": "clear.svg",
+    "image": "clear.png",
     "text": "すべての謎を解いた瞬間、なぜか施設は大爆発した。脱出成功！",
-    "tweetText": "『template』をクリア！\n無事爆破できた！\n#ねぎなぞ脱出 #謎解き"
+    "tweetText": "『template』を脱出成功！\n部屋を無事爆破できた！\n#ねぎなぞ脱出 #謎解き"
   }
 }

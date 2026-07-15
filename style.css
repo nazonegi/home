@@ -218,28 +218,47 @@ button {
 }
 
 .overlay {
-    position: fixed;
-    inset: 0;
-    background: #000a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 18px;
-    z-index: 1000
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+
+  padding:
+    max(16px, env(safe-area-inset-top))
+    16px
+    max(16px, env(safe-area-inset-bottom));
+
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.modalbox {
+  position: relative;
+  width: min(720px, 100%);
+  margin: auto 0;
+  padding: 28px;
+  background: var(--card);
+  border-radius: 22px;
+}
+
+.clearimg {
+  display: block;
+  width: 100%;
+  max-width: 600px;
+  max-height: 50vh;
+  max-height: 50dvh;
+  margin: 0 auto;
+  object-fit: contain;
 }
 
 .hidden {
     display: none !important
-}
-
-.modalbox {
-    position: relative;
-    width: min(720px, 100%);
-    max-height: 90vh;
-    overflow: auto;
-    background: var(--card);
-    border-radius: 22px;
-    padding: 28px
 }
 
 .close {
