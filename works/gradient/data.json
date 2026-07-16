@@ -1,0 +1,107 @@
+{
+  "version": "1.0",
+  "id": "gradient",
+  "title": "グラデーションハウスからの脱出",
+  "author": "ねぎ",
+  "difficulty": 2,
+  "time": "10〜20分",
+  "titleImage": "title.png",
+  "supportButtonText": "気付く",
+  "supportThinkingImage": "thinking.png",
+  "intro": "しまった！！！\nなんやかんやあってグラデーションのすごい家に閉じ込められてしまった！！！\n目がチカチカするから脱出しないと！\n脱出するためには4つのなぞを解かなければならないみたいだ。",
+  "howToPlay": "回答するときはひらがなで入力してください。\n\n行き詰まったときは「気付く」ボタンを押してみましょう。\n\nまだ見つけていない新しい何かに、なぞねぎが気付くかもしれません。",
+  "notice": [
+    "配信OK",
+    "ソースコードを見ないと解けない謎は一切ありません。"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "label": "Q1",
+      "image": "q1.png",
+      "answers": [
+        "みつ"
+      ],
+      "successMessage": "次のなぞをみよう",
+      "notices": [
+        {
+          "type": "text",
+          "content": "数え方を考えてみるか"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "label": "Q2",
+      "image": "q2.png",
+      "answers": [
+        "くつ"
+      ],
+      "successMessage": "次のなぞをみよう",
+      "notices": [
+        {
+          "type": "text",
+          "content": "長月は旧暦で「くがつ」、あなは「どうくつ」のことぽい"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "label": "Q3",
+      "image": "q3.png",
+      "answers": [
+        "あり"
+      ],
+      "successMessage": "次のなぞをみよう",
+      "notices": [
+        {
+          "type": "text",
+          "content": "サメは漢字で書くと鮫。鮎と鰤の読み方は？検索してみてよう。"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "label": "Q4",
+      "image": "q4.png",
+      "answers": [
+        "みき"
+      ],
+      "successMessage": "次のなぞをみよう",
+      "notices": [
+        {
+          "type": "text",
+          "content": "味わう、嗅ぐはどちらとも五感にふくまれる。味覚は3、嗅覚は9。では4と兆は？"
+        }
+      ]
+    },
+    {
+      "id": "last",
+      "label": "LAST",
+      "image": "last.png",
+      "answers": [
+        "くりあ"
+      ],
+      "successMessage": "最後の答えにたどり着いた。",
+      "notices": [
+        {
+          "type": "text",
+          "content": "なぞの枠の色がつながるように、順番にならべて今までの答えをかきだしてみよう"
+        },
+        {
+          "type": "text",
+          "content": "「ありくつみきみつ？」の順番になるはずだ。両矢印が何を表すかを考えてみよう。"
+        },
+        {
+          "type": "text",
+          "content": "次の場合も両矢印で示せる\nしんぶんし\n←ーーー→"
+        }
+      ]
+    }
+  ],
+  "ending": {
+    "image": "clear.png",
+    "text": "「くりあ」となぞねぎが叫ぶと扉がひとりでに空いた。\nなんだか家が感謝してるような感じがした。\nなぞねぎは、まよわず家を大爆発させた。",
+    "tweetText": "『グラデーションハウスからの脱出』を脱出成功！\n部屋を無事爆破できた！\n\n\n#ねぎなぞ脱出 #謎解き #Web謎"
+  }
+}

@@ -1,12 +1,11 @@
 {
   "version": "1.0",
   "id": "template",
-  "title": "template",
+  "title": "脱出タイトル",
   "author": "ねぎ",
   "difficulty": 2,
   "time": "10〜20分",
   "titleImage": "title.png",
-  "ogpImage": "ogp.png",
   "supportButtonText": "気付く",
   "supportThinkingImage": "thinking.png",
   "intro": "しまった！！！！うっかりして遺跡に迷い込んでしまった！！\n脱出するためには4つのなぞを解かなければならないみたいだ。",
@@ -70,6 +69,6 @@
   "ending": {
     "image": "clear.png",
     "text": "すべての謎を解いた瞬間、なぜか施設は大爆発した。脱出成功！",
-    "tweetText": "『template』を脱出成功！\n部屋を無事爆破できた！\n#ねぎなぞ脱出 #謎解き"
+    "tweetText": "『脱出タイトル』を脱出成功！\n部屋を無事爆破できた！\n\n\n#ねぎなぞ脱出 #謎解き #Web謎"
   }
 }
