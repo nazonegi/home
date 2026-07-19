@@ -182,7 +182,39 @@ function notice(){let ns=gameData.questions[currentQuestionIndex].notices||[];if
 
 function resetConfirm(){modal('<h2>進捗リセット</h2><p>進捗をリセットしますか？</p><p>これまでの解放状況と回答履歴が削除されます。</p><div class="modalactions"><button id="doReset">リセットする</button><button id="cancelReset">キャンセル</button></div>');E("doReset").onclick=()=>{localStorage.removeItem(key());currentQuestionIndex=unlockedIndex=0;submittedAnswers={};squareState={placements:{q1:["","","",""],q2:["","","",""],q3:["","","",""],q4:["","","",""]},completed:{q1:false,q2:false,q3:false,q4:false},lastRevealed:false};closeModal();render()};E("cancelReset").onclick=closeModal}
 
-function clearModal(){let e=gameData.ending||{},url=`https://twitter.com/intent/tweet?text=${encodeURIComponent((e.tweetText||"")+"\n"+location.href.replace(/game\.html.*$/,""))}`;modal(`<div class="clear"><h1>CLEAR</h1><h2>クリア！脱出成功！</h2><img class="clearimg" src="images/${esc(e.image)}"><p>${esc(e.text)}</p><a class="tweet" target="_blank" rel="noopener" href="${url}">クリアポスト</a><p class="thanks">THANK YOU FOR PLAYING</p></div>`)}
+function clearModal() {
+  const e = gameData.ending || {};
+
+  // game.html を除いた作品トップURL
+  const shareUrl = new URL(".", location.href).href;
+
+  // 投稿本文
+  const text = `${e.tweetText || ""}\n${shareUrl}`;
+
+  // X投稿画面
+  const postUrl =
+    `https://x.com/intent/post?text=${encodeURIComponent(text)}`;
+
+  modal(`
+    <div class="clear">
+      <h1>CLEAR</h1>
+      <h2>クリア！脱出成功！</h2>
+      <img class="clearimg" src="images/${esc(e.image)}">
+      <p>${esc(e.text)}</p>
+
+      <a
+        class="tweet"
+        href="${postUrl}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        クリアポスト
+      </a>
+
+      <p class="thanks">THANK YOU FOR PLAYING</p>
+    </div>
+  `);
+}
 function modal(h){E("modalContent").innerHTML=h;E("modal").classList.remove("hidden")}
 function closeModal(){E("modal")?.classList.add("hidden")}
 function norm(v){return String(v||"").trim().toLowerCase().replace(/[Ａ-Ｚａ-ｚ０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).replace(/[ァ-ン]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60)).replace(/\s+/g,"")}
