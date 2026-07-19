@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>loading...</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="container game">
+  <section class="card square-question-card">
+  <div class="square-question-header">
+    <h1 id="questionLabel" class="qlabel"></h1>
+    <button id="noticeButton" class="square-notice-link" type="button">気付く</button>
+  </div>
+
+  <div id="puzzleStage" class="puzzle-stage">
+    <div class="square-wall">
+      <img id="questionImage" class="puzzle">
+      <button type="button" class="square-corner square-corner-tl hidden" data-square-corner="tl" aria-label="左上の角"></button>
+      <button type="button" class="square-corner square-corner-tr hidden" data-square-corner="tr" aria-label="右上の角"></button>
+      <button type="button" class="square-corner square-corner-br hidden" data-square-corner="br" aria-label="右下の角"></button>
+      <button type="button" class="square-corner square-corner-bl hidden" data-square-corner="bl" aria-label="左下の角"></button>
+    </div>
+  </div>
+
+  <button id="squareCornerResetButton" class="square-corner-reset hidden" type="button">角をリセット</button>
+
+  <p id="lastAnswer" class="submitted hidden"></p>
+
+  <nav class="pager">
+    <button id="prevButton">◀</button>
+    <div id="stepNav"></div>
+    <button id="nextButton">▶</button>
+  </nav>
+</section>
+
+<section class="card answer">
+    <h2>答え</h2>
+    <div class="answerrow">
+      <input id="answerInput" autocomplete="off">
+      <button id="answerButton">決定</button>
+    </div>
+    <p id="wrongMessage" class="ng"></p>
+    <div class="resetarea">
+      <button id="progressResetButton" class="resetlink">進捗リセット</button>
+    </div>
+  </section>
+</main>
+
+<div id="modal" class="overlay hidden">
+  <div class="modalbox">
+    <button id="modalClose" class="close">×</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<div id="viewer" class="overlay viewer hidden">
+  <button id="viewerClose" class="close">×</button>
+  <img id="viewerImage">
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

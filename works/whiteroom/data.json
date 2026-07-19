@@ -1,0 +1,201 @@
+{
+  "version": "1.1",
+  "id": "whiteroom",
+  "title": "白い部屋からの脱出",
+  "author": "ねぎ",
+  "difficulty": 3,
+  "time": "30-60分",
+  "titleImage": "title.png",
+  "supportButtonText": "気付く",
+  "supportThinkingImage": "thinking.png",
+  "intro": "しまった！\n\nうたたねして、気が付いたら白い部屋にとじこめられた！\nこんな何にもない所にはいれられない！\n脱出しないと",
+  "howToPlay": "回答するときはひらがなで入力してください。\n\n行き詰まったときは「気付く」ボタンを押してみましょう。\n\nまだ見つけていない新しい何かに、なぞねぎが気付くかもしれません。",
+  "notice": [
+    "配信OK",
+    "ソースコードを見ないと解けない謎は一切ありません。"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "label": "Q1",
+      "image": "q1.svg",
+      "answers": [
+        "かいうん"
+      ],
+      "successMessage": "次の壁に移ろう",
+      "notices": [
+        {
+          "type": "text",
+          "content": "真ん中には「し」が入りそうだ。"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "label": "Q2",
+      "image": "q2.svg",
+      "answers": [
+        "てんこう"
+      ],
+      "successMessage": "次の壁に移ろう",
+      "notices": [
+        {
+          "type": "text",
+          "content": "この形、、、スマホでの入力でみたような。"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "label": "Q3",
+      "image": "q3.svg",
+      "answers": [
+        "かんこう"
+      ],
+      "successMessage": "次の壁に移ろう",
+      "notices": [
+        {
+          "type": "text",
+          "content": "思追い付くのは「らしんばん」「コンパス」「ほういじしん」「ひがし」「いーすと」「ほうがく」「ほうこう」？？"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "label": "Q4",
+      "image": "q4.svg",
+      "answers": [
+        "うんてい"
+      ],
+      "successMessage": "床に問題がでてきた。",
+      "notices": [
+        {
+          "type": "text",
+          "content": "この問題にある5個のマスだけではたりなさそう。どこか別のところにマスがないだろうか"
+        },
+        {
+          "type": "text",
+          "content": "今までの問題のマスを合わせて合計8パーツでタテ6×ヨコ8マスの長方形をつくろう"
+        },
+        {
+          "type": "image",
+          "content": "q4_notice1.png"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "label": "Q5",
+      "image": "q5.svg",
+      "answers": [
+        "こううん"
+      ],
+      "successMessage": "「ｶﾁｬﾘ」とどこかで音がした。\n天井の最後の問題に移ろう！",
+      "notices": [
+        {
+          "type": "text",
+          "content": "「んうこう」を並び替えてできそうな言葉といえば？"
+        }
+      ]
+    },
+    {
+      "id": "last",
+      "label": "LAST",
+      "image": "last.svg",
+      "answers": [
+        "てんかい"
+      ],
+      "successMessage": "最後の答えにたどり着いた。",
+      "notices": [
+        {
+          "type": "text",
+          "content": "過去の問題も振り返って、今どんな部屋にいるかを振り返ってみよう"
+        },
+        {
+          "type": "text",
+          "content": "Q1-Q4の問題の四隅の四角にはその問題の答えがはいり、部屋は立方体。\nつまり部屋の角には1文字ひらがなが割り当たる"
+        },
+        {
+          "type": "image",
+          "content": "last_notice1.png"
+        },
+        {
+          "type": "text",
+          "content": "答えは「んいかて」のアナグラムになるはず！でも答えが複数でそうだ。ためしに入力してみよう"
+        }
+      ]
+    }
+  ],
+  "squareGimmick": {
+    "unlockAfter": "q5",
+    "cornerOrder": [
+      "tl",
+      "tr",
+      "br",
+      "bl"
+    ],
+    "correctCorners": {
+      "q1": [
+        "か",
+        "い",
+        "う",
+        "ん"
+      ],
+      "q2": [
+        "ん",
+        "て",
+        "う",
+        "こ"
+      ],
+      "q3": [
+        "か",
+        "ん",
+        "こ",
+        "う"
+      ],
+      "q4": [
+        "て",
+        "い",
+        "ん",
+        "う"
+      ]
+    },
+    "q5FixedCorners": [
+      "ん",
+      "う",
+      "こ",
+      "う"
+    ],
+    "lastFixedCorners": [
+      "い",
+      "か",
+      "ん",
+      "て"
+    ]
+  },
+  "lastAnswers": {
+    "てんかい": {
+      "type": "clear"
+    },
+    "かいてん": {
+      "type": "popup",
+      "message": "正解！ゴゴゴゴゴ！建物そのものが回転しはじめた！しばらくすると元の位置に戻ってしまった。扉はどこにもない。どうやらこれでは脱出できないようだ",
+      "reactionImage": "reaction_kaiten.png"
+    },
+    "かんてい": {
+      "type": "popup",
+      "message": "正解！「ﾋﾟﾋﾟﾋﾟ！鑑定します。なぞねぎの価値216円！！」なぞねぎはイラっとした。扉はどこにもない。どうやらこれでは脱出できないようだ",
+      "reactionImage": "reaction_kantei.png"
+    },
+    "いかてん": {
+      "type": "popup",
+      "message": "正解！どこからともなくイカ天がでてきた！おいしい！扉はどこにもない。どうやらこれでは脱出できないようだ",
+      "reactionImage": "reaction_ikaten.png"
+    }
+  },
+  "ending": {
+    "image": "clear.png",
+    "text": "立方体の白い部屋は展開しなぞねぎを外に出してくれた。なんてすがすがしい青空！！気持ちいい！爆発させよう！脱出成功！",
+    "tweetText": "『白い部屋からの脱出』を脱出成功！\n部屋を無事爆破できた！\n\n\n#ねぎなぞ脱出 #謎解き #Web謎"
+  }
+}

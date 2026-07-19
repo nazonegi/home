@@ -1,0 +1,170 @@
+*{box-sizing:border-box}:root{--bg:#f4efe7;--card:#fffaf2;--ink:#3d3024;--muted:#776a5e;--accent:#8b6f47;--ng:#a33a32}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 system-ui,"Yu Gothic",sans-serif}.container{width:min(1080px,calc(100% - 24px));margin:auto;padding:24px 0 48px}.game{width:min(880px,calc(100% - 24px))}.hero{text-align:center}.card{background:var(--card);border-radius:22px;padding:24px;margin:18px 0;box-shadow:0 12px 28px #4028141f}.hero-card{padding:0;overflow:hidden}.hero-card img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}.works{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}.work{color:inherit;text-decoration:none;background:var(--card);border-radius:18px;overflow:hidden;box-shadow:0 8px 18px #4028141a}.work img{width:100%;aspect-ratio:16/9;object-fit:cover}.workbody{padding:14px 16px}.meta{display:flex;gap:8px;flex-wrap:wrap}.meta span{background:#efe1c8;padding:5px 10px;border-radius:999px;font-weight:700}.start{text-align:center;margin-top:28px}.start a,button{min-height:44px;border:0;border-radius:999px;background:#d8b36d;color:#3f2a14;font-weight:800;padding:10px 18px;cursor:pointer}.start a{display:inline-flex;min-width:200px;align-items:center;justify-content:center;text-decoration:none}.qlabel{text-align:center}.puzzle{display:block;width:100%;height:auto;max-height:68vh;object-fit:contain;border-radius:14px;cursor:zoom-in}.submitted{width:fit-content;max-width:100%;margin:14px auto;padding:8px 12px;background:#f2e7d4;border-radius:12px;font-weight:700;word-break:break-word}#noticeButton{display:block;margin:18px auto}.pager{display:flex;align-items:center;justify-content:center;gap:12px}.pager button:disabled{opacity:.38;cursor:not-allowed}.dot{width:22px;height:22px;min-height:22px;padding:0;border:2px solid var(--accent);background:transparent}.dot.current{background:var(--accent)}#stepNav{display:flex;gap:9px}.answer h2{text-align:center}.answerrow{display:flex;gap:10px}.answerrow input{flex:1;min-height:44px;border:1px solid #cab896;border-radius:12px;padding:10px 12px;font-size:16px}.answerrow input::placeholder{color:#aaa39a}.ng{color:var(--ng);font-weight:700;text-align:center;min-height:1.5em}.resetarea{text-align:center;margin-top:22px}.resetlink{background:transparent;color:var(--muted);text-decoration:underline;font:inherit;font-size:14px}.overlay{position:fixed;inset:0;background:#000a;display:flex;align-items:center;justify-content:center;padding:18px;z-index:1000}.hidden{display:none!important}.modalbox{position:relative;width:min(720px,100%);max-height:90vh;overflow:auto;background:var(--card);border-radius:22px;padding:28px}.close{position:absolute;top:10px;right:12px;width:44px;padding:0;font-size:24px}.modalactions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}.thinking{display:block;width:110px;height:110px;object-fit:contain;margin:auto}.pre,.noticecontent{white-space:pre-line}.noticeimg,.clearimg{width:100%;max-height:60vh;object-fit:contain}.viewer{overflow:auto;align-items:flex-start}.viewer img{width:min(1400px,96vw);height:auto;margin:70px auto 20px;background:#fff}.clear{text-align:center}.thanks{font-weight:800;letter-spacing:.18em}.tweet{display:inline-flex;margin-top:20px;padding:12px 24px;border-radius:999px;background:#111;color:#fff;text-decoration:none;font-weight:800}@media(max-width:560px){.container{width:calc(100% - 16px);padding-top:10px}.card{padding:16px}.hero-card{padding:0}.answerrow{flex-direction:column}}
+
+/* ===== square 専用ギミック（works/square 内だけで有効） ===== */
+
+/* 問題カードの基本背景は従来どおり薄いクリーム色 */
+.square-question-card{
+  position:relative;
+}
+
+/* Q番号と「気付く」は壁の外側 */
+.square-question-header{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:48px;
+  margin-bottom:14px;
+}
+
+.square-question-header .qlabel{
+  margin:0;
+}
+
+.square-notice-link{
+  position:absolute;
+  right:0;
+  top:50%;
+  transform:translateY(-50%);
+  min-height:auto;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  color:var(--accent);
+  font-weight:700;
+  text-decoration:underline;
+  text-underline-offset:3px;
+  cursor:pointer;
+}
+
+.square-notice-link:hover{
+  opacity:.7;
+}
+
+/*
+  「壁」を表す大きな白い正方形。
+  この中に含まれるのは謎画像と4つの角マスだけ。
+*/
+.puzzle-stage{
+  width:min(100%,760px);
+  margin:0 auto;
+}
+
+.square-wall{
+  position:relative;
+  width:100%;
+  aspect-ratio:1 / 1;
+  background:#fff;
+  padding:clamp(54px,8vw,82px);
+  box-shadow:0 8px 22px rgba(64,40,20,.08);
+}
+
+/*
+  謎画像は壁の中央に配置。
+  四角い壁の内側に余白を確保するため、画像は一回り小さくする。
+*/
+.square-wall .puzzle{
+  display:block;
+  width:100%;
+  height:100%;
+  max-height:none;
+  object-fit:contain;
+}
+
+/*
+  角マスは大きな白い正方形の四隅にぴったり合わせる。
+  角マスそのものも「壁の頂点」の一部に見えるよう、白背景＋細い枠。
+*/
+.square-corner{
+  position:absolute;
+  width:clamp(46px,6vw,62px);
+  aspect-ratio:1 / 1;
+  min-height:0;
+  padding:0;
+  border:2px solid var(--ink);
+  border-radius:2px;
+  background:#fff;
+  color:var(--ink);
+  display:grid;
+  place-items:center;
+  font-size:clamp(20px,3.5vw,32px);
+  line-height:1;
+  z-index:3;
+}
+
+.square-corner-tl{
+  left:0;
+  top:0;
+}
+
+.square-corner-tr{
+  right:0;
+  top:0;
+}
+
+.square-corner-br{
+  right:0;
+  bottom:0;
+}
+
+.square-corner-bl{
+  left:0;
+  bottom:0;
+}
+
+/* リセットは壁の外側 */
+.square-corner-reset{
+  display:block;
+  margin:14px auto 0;
+}
+
+/* LAST別解リアクション画像 */
+.square-reaction{
+  display:block;
+  width:min(180px,48vw);
+  max-height:180px;
+  object-fit:contain;
+  margin:0 auto 14px;
+}
+
+/* 既存Templateのページネーションはそのまま使う */
+.square-question-card .pager{
+  margin-top:18px;
+}
+
+/* タブレット */
+@media(max-width:760px){
+  .square-wall{
+    padding:56px;
+  }
+
+  .square-corner{
+    width:50px;
+  }
+
+  .square-notice-link{
+    right:4px;
+  }
+}
+
+/* スマホ */
+@media(max-width:520px){
+  .square-question-header{
+    min-height:44px;
+    padding-right:56px;
+  }
+
+  .square-notice-link{
+    font-size:14px;
+  }
+
+  .square-wall{
+    padding:44px;
+  }
+
+  .square-corner{
+    width:42px;
+    font-size:22px;
+  }
+}
