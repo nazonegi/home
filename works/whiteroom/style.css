@@ -168,3 +168,31 @@
     font-size:22px;
   }
 }
+
+.clear-home-link{
+  margin-top:24px;
+  text-align:center;
+}
+
+.clear-home-link p{
+  margin:0 0 8px;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.clear-home-link a{
+  display:inline-flex;
+  min-height:44px;
+  align-items:center;
+  justify-content:center;
+  padding:10px 22px;
+  border-radius:999px;
+  background:var(--accent);
+  color:#fff;
+  font-weight:800;
+  text-decoration:none;
+}
+
+.clear-home-link a:hover{
+  filter:brightness(.92);
+}

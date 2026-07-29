@@ -212,6 +212,11 @@ function clearModal() {
       </a>
 
       <p class="thanks">THANK YOU FOR PLAYING</p>
+
+      <div class="clear-home-link">
+        <p>他の謎解きに挑戦する↓</p>
+        <a href="https://nazonegi.github.io/home/">なぞねぎ脱出</a>
+      </div>
     </div>
   `);
 }

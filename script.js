@@ -83,5 +83,23 @@ function notice() {
   }
 }
 function resetConfirm() { modal('<h2>進捗リセット</h2><p>進捗をリセットしますか？</p><p>これまでの解放状況と回答履歴が削除されます。</p><div class="modalactions"><button id="doReset">リセットする</button><button id="cancelReset">キャンセル</button></div>'); E("doReset").onclick = () => { localStorage.removeItem(key()); currentQuestionIndex = unlockedIndex = 0; submittedAnswers = {}; closeModal(); render() }; E("cancelReset").onclick = closeModal }
-function clearModal() { let e = gameData.ending || {}, url = `https://twitter.com/intent/tweet?text=${encodeURIComponent((e.tweetText || "") + "\n" + location.href.replace(/game\.html.*$/, ""))}`; modal(`<div class="clear"><h1>CLEAR</h1><h2>クリア！脱出成功！</h2><img class="clearimg" src="images/${esc(e.image)}"><p>${esc(e.text)}</p><a class="tweet" target="_blank" rel="noopener" href="${url}">クリアポスト</a><p class="thanks">THANK YOU FOR PLAYING</p></div>`) }
+function clearModal() {
+  const e = gameData.ending || {};
+  const shareUrl = new URL(".", location.href).href;
+  const text = `${e.tweetText || ""}\n${shareUrl}`;
+  const postUrl = `https://x.com/intent/post?text=${encodeURIComponent(text)}`;
+
+  modal(`<div class="clear">
+    <h1>CLEAR</h1>
+    <h2>クリア！脱出成功！</h2>
+    <img class="clearimg" src="images/${esc(e.image)}">
+    <p>${esc(e.text)}</p>
+    <a class="tweet" target="_blank" rel="noopener noreferrer" href="${postUrl}">クリアポスト</a>
+    <p class="thanks">THANK YOU FOR PLAYING</p>
+    <div class="clear-home-link">
+      <p>他の謎解きに挑戦する↓</p>
+      <a href="https://nazonegi.github.io/home/">なぞねぎ脱出</a>
+    </div>
+  </div>`);
+}
 function modal(h) { E("modalContent").innerHTML = h; E("modal").classList.remove("hidden") } function closeModal() { E("modal")?.classList.add("hidden") } function norm(v) { return String(v || "").trim().toLowerCase().replace(/[Ａ-Ｚａ-ｚ０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)).replace(/[ァ-ン]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60)).replace(/\s+/g, "") } function validate() { if (!gameData.title || !gameData.questions?.length) throw Error("設定エラー：data.jsonを確認してください。"); if (gameData.questions.at(-1).id !== "last") throw Error("設定エラー：最後の問題の id は last にしてください。") } function esc(v) { return String(v ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;") }
