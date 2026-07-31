@@ -1,0 +1,62 @@
+{
+  "version": "1.0",
+  "id": "onlylast",
+  "title": "大謎しかない部屋からの脱出",
+  "author": "ねぎ",
+  "difficulty": 4,
+  "time": "45-60分",
+  "titleImage": "title.png",
+  "allQuestionsUnlocked": true,
+  "clearWhenAllSolved": true,
+  "supportButtonText": "気付く",
+  "supportThinkingImage": "thinking.png",
+  "intro": "しまった！大謎しかない部屋に閉じ込められてしまった！\n4つの大謎をすべて解いて、この部屋から脱出しよう。",
+  "howToPlay": "RED・YELLOW・GREEN・BLUEの4問は、最初から好きな順番で挑戦できます。\n\n回答するときはひらがなで入力してください。\n\n4問すべてに正解すると脱出成功です。",
+  "notice": [
+    "配信OK",
+    "ソースコードを見ないと解けない謎は一切ありません。"
+  ],
+  "questions": [
+    {
+      "id": "green",
+      "label": "GREEN",
+      "color": "green",
+      "image": "green.png",
+      "answers": ["うみねこ"],
+      "successMessage": "GREENの大謎を解き明かした！",
+      "notices": []
+    },
+    {
+      "id": "yellow",
+      "label": "YELLOW",
+      "color": "yellow",
+      "image": "yellow.svg",
+      "answers": ["かみなり"],
+      "successMessage": "YELLOWの大謎を解き明かした！",
+      "notices": []
+    },
+    {
+      "id": "red",
+      "label": "RED",
+      "color": "red",
+      "image": "red.png",
+      "answers": ["たまねぎ"],
+      "successMessage": "REDの大謎を解き明かした！",
+      "notices": []
+    },
+    {
+      "id": "blue",
+      "label": "BLUE",
+      "color": "blue",
+      "image": "blue.svg",
+      "answers": ["うぐいす"],
+      "successMessage": "BLUEの大謎を解き明かした！",
+      "notices": []
+    }
+  ],
+  "ending": {
+    "image": "clear.png",
+    "text": "4つの大謎をすべて解き明かし、脱出に成功した！\n\n謎ねぎは感謝して大爆破した。脱出成功！",
+    "tweetText": "『大謎しかない部屋からの脱出』を脱出成功！\n4つの大謎をすべて解き明かし無事爆破できた！\n\n#ねぎ謎脱出 #謎解き #Web謎"
+  }
+}

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>loading...</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="onlylast.css">
+</head>
+
+<body>
+    <main class="container game">
+        <section class="card">
+            <div class="question-header">
+                <h1 id="questionLabel" class="qlabel"></h1>
+                <button id="noticeButton" class="notice-link">気付く</button>
+            </div>
+            <img id="questionImage" class="puzzle" alt="謎画像">
+            <div id="yellowPuzzle" class="yellow-puzzle hidden">
+                <div class="yellow-expanded-content">
+                    <div id="yellowBoard" class="yellow-board" aria-label="YELLOWの文字盤"></div>
+                    <p class="yellow-instruction">できた英単語を日本語にした4文字が答え</p>
+                </div>
+                <div class="yellow-actions">
+                    <div class="yellow-expand-toolbar">
+                        <button id="yellowExpandButton" class="yellow-expand-button" type="button"
+                            aria-expanded="false">拡大</button>
+                    </div>
+                    <button id="yellowResetButton" class="yellow-reset" type="button" aria-label="選択をリセット">
+                        <span class="yellow-reset-icon" aria-hidden="true">↻</span>
+                        <span class="yellow-reset-label">選択をリセット</span>
+                    </button>
+                </div>
+            </div>
+            <div id="bluePuzzle" class="blue-puzzle hidden">
+                <section class="blue-rules" aria-labelledby="blueRulesTitle">
+                    <h2 id="blueRulesTitle">ルール</h2>
+                    <p>
+                        水色マスを以下のルールにしたがい一筆書きで結んだとき、
+                        5の倍数番目のマスの指示に従え。
+                    </p>
+                    <ul>
+                        <li>水色のマスの[謎の答え][イラストの文字]が辞書の昇順になるようにマスを通ること</li>
+                        <li>水色のマスからスタートして、水色のマスにゴールすること</li>
+                        <li>最初の水色マスを1マス目とする</li>
+                        <li>太い線は横切ることができず、タテ・ヨコにしか進めない</li>
+                    </ul>
+                </section>
+                <div class="blue-expanded-content">
+                    <div id="blueGrid" class="blue-grid" aria-label="BLUEのルート選択盤面"></div>
+                    <p id="blueRouteMessage" class="blue-route-message" aria-live="polite"></p>
+                    <div class="blue-extraction">
+                        <p>5の倍数番目の文字</p>
+                        <div id="blueExtractedLetters" class="blue-extracted-letters"></div>
+                    </div>
+                </div>
+                <div class="blue-actions">
+                    <div class="blue-expand-toolbar">
+                        <button id="blueExpandButton" class="blue-expand-button" type="button"
+                            aria-expanded="false">拡大</button>
+                    </div>
+                    <button id="blueResetButton" class="blue-reset" type="button" aria-label="ルートをリセット">
+                        <span class="blue-reset-icon" aria-hidden="true">↻</span>
+                        <span class="blue-reset-label">ルートをリセット</span>
+                    </button>
+                </div>
+            </div>
+            <p id="lastAnswer" class="submitted hidden"></p>
+            <nav class="pager"><button id="prevButton">◀</button>
+                <div id="stepNav"></div><button id="nextButton">▶</button>
+            </nav>
+        </section>
+        <section class="card answer">
+            <h2>答え</h2>
+            <div class="answerrow"><input id="answerInput" autocomplete="off"><button id="answerButton">決定</button>
+            </div>
+            <p id="wrongMessage" class="ng"></p>
+            <div class="resetarea"><button id="progressResetButton" class="resetlink">進捗リセット</button></div>
+        </section>
+    </main>
+    <div id="modal" class="overlay hidden">
+        <div class="modalbox"><button id="modalClose" class="close">×</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+    <div id="viewer" class="overlay viewer hidden"><button id="viewerClose" class="close">×</button><img
+            id="viewerImage" alt="謎画像の拡大表示"></div>
+    <script src="../../script.js"></script>
+    <script src="onlylast.js"></script>
+</body>
+
+</html>
