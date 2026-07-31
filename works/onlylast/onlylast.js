@@ -434,6 +434,11 @@ function selectBlueCell(cell) {
     }
   }
 
+  if (blueRoute.length === 53 && !blueSpecialCells.has(key)) {
+    showBlueMessage("ゴールは青マスでないといけません");
+    return;
+  }
+
   blueRoute.push({
     row,
     col,

@@ -13,6 +13,7 @@
   "intro": "しまった！大謎しかない部屋に閉じ込められてしまった！\n4つの大謎をすべて解いて、この部屋から脱出しよう。",
   "howToPlay": "RED・YELLOW・GREEN・BLUEの4問は、最初から好きな順番で挑戦できます。\n\n回答するときはひらがなで入力してください。\n\n4問すべてに正解すると脱出成功です。",
   "notice": [
+    "メモ推奨！",
     "配信OK",
     "ソースコードを見ないと解けない謎は一切ありません。"
   ],
@@ -23,8 +24,16 @@
       "color": "green",
       "image": "green.png",
       "answers": ["うみねこ"],
-      "successMessage": "GREENの大謎を解き明かした！",
-      "notices": []
+      "successMessage": "緑色の大謎を解き明かした！",
+      "notices": [
+        {
+          "type": "text",
+          "content": "黄色のなぞが解けてからにしよう"
+        },
+        {
+          "type": "text",
+          "content": "黄色が「かみなり」、青色が「うぐいす」、赤色が「たまねぎ」なので答えは「うみねこ」"
+        }]
     },
     {
       "id": "yellow",
@@ -32,8 +41,32 @@
       "color": "yellow",
       "image": "yellow.svg",
       "answers": ["かみなり"],
-      "successMessage": "YELLOWの大謎を解き明かした！",
-      "notices": []
+      "successMessage": "黄色の大謎を解き明かした！",
+      "notices": [
+        {
+          "type": "text",
+          "content": "マスの枠線が緑色で、かつクリックすると太線になる。緑色の謎にかかわっているようだ"
+        },
+        {
+          "type": "text",
+          "content": "「い・か・り」の文字が緑色の謎にもあり、いずれも太線に隣接している。それを黄色に適用する。のこりは「う・た」の文字でみどりの謎のどこかに入ると思われる。"
+        },
+        {
+          "type": "image",
+          "content": "yellow_notice1.png"
+        },
+        {
+          "type": "text",
+          "content": "問題文と「e」から英単語ができると思われる。「う・た」がどのような形になればすべてがアルファベットのように見えるようになるだろう"
+        },
+        {
+          "type": "image",
+          "content": "yellow_notice2.png"
+        },
+        {
+          "type": "text",
+          "content": "太線を見ると「Thunder」と読めるので答えは「かみなり」"
+        }]
     },
     {
       "id": "red",
@@ -41,8 +74,24 @@
       "color": "red",
       "image": "red.png",
       "answers": ["たまねぎ"],
-      "successMessage": "REDの大謎を解き明かした！",
-      "notices": []
+      "successMessage": "赤色の大謎を解き明かした！",
+      "notices": [
+        {
+          "type": "text",
+          "content": "青色のなぞが解けてからにしよう"
+        },
+        {
+          "type": "text",
+          "content": "黄色が「かみなり」、青色が「うぐいす」、緑色が「うみ〇こ」でイラストが「ほね」「こうか」「たきぎょう」。これでは足りなさそうだ"
+        },
+        {
+          "type": "text",
+          "content": "青色のなぞのイラストも使おう「かた」「すまほ」「ねんりょう」"
+        },
+        {
+          "type": "text",
+          "content": "しりとりでつなげると「かた」「たきぎょう」「うぐいす」「すまほ」「ほね」「ねんりょう」「うみ〇こ」「こうか」「かみなり」で答えは「たまねぎ」"
+        }]
     },
     {
       "id": "blue",
@@ -50,8 +99,32 @@
       "color": "blue",
       "image": "blue.svg",
       "answers": ["うぐいす"],
-      "successMessage": "BLUEの大謎を解き明かした！",
-      "notices": []
+      "successMessage": "青色の大謎を解き明かした！",
+      "notices": [
+        {
+          "type": "text",
+          "content": "黄色のなぞが解けてからにしよう"
+        },
+        {
+          "type": "text",
+          "content": "黄色の謎が解けたことで緑色が「うみ〇こ」、黄色が「かみなり」、赤色が「た〇〇〇」、青色が「う〇い〇」であることが分かった。"
+        },
+        {
+          "type": "text",
+          "content": "たどる順は「うみ〇こ（緑色）」「かた」「かみなり（黄）」「すまほ」「た〇〇〇（赤色）」「ねんりょう」になる。"
+        },
+        {
+          "type": "image",
+          "content": "blue_notice1.png"
+        },
+        {
+          "type": "text",
+          "content": "アール（r）は黄色の謎ででてきた。8回クリックしよう"
+        },
+        {
+          "type": "text",
+          "content": "青色の謎の「にわとり」の文字のうえを読むと、答えは「うぐいす」"
+        }]
     }
   ],
   "ending": {
