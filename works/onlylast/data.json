@@ -19,7 +19,7 @@
   "questions": [
     {
       "id": "green",
-      "label": "GREEN",
+      "label": "？",
       "color": "green",
       "image": "green.png",
       "answers": ["うみねこ"],
@@ -28,7 +28,7 @@
     },
     {
       "id": "yellow",
-      "label": "YELLOW",
+      "label": "？",
       "color": "yellow",
       "image": "yellow.svg",
       "answers": ["かみなり"],
@@ -37,7 +37,7 @@
     },
     {
       "id": "red",
-      "label": "RED",
+      "label": "？",
       "color": "red",
       "image": "red.png",
       "answers": ["たまねぎ"],
@@ -46,7 +46,7 @@
     },
     {
       "id": "blue",
-      "label": "BLUE",
+      "label": "？",
       "color": "blue",
       "image": "blue.svg",
       "answers": ["うぐいす"],
