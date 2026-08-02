@@ -639,15 +639,16 @@ button.yellow-cell-content {
 }
 
 .blue-cell.wall-right {
-  box-shadow: inset -7px 0 #5b9bd5;
+  border-right: 7px solid #5b9bd5;
 }
 
 .blue-cell.wall-bottom {
-  box-shadow: inset 0 -7px #5b9bd5;
+  border-bottom: 7px solid #5b9bd5;
 }
 
 .blue-cell.wall-right.wall-bottom {
-  box-shadow: inset -7px 0 #5b9bd5, inset 0 -7px #5b9bd5;
+  border-right: 7px solid #5b9bd5;
+  border-bottom: 7px solid #5b9bd5;
 }
 
 .blue-cell.selected::after {
@@ -754,15 +755,16 @@ button.yellow-cell-content {
   }
 
   .blue-cell.wall-right {
-    box-shadow: inset -4px 0 #5b9bd5;
+    border-right-width: 4px;
   }
 
   .blue-cell.wall-bottom {
-    box-shadow: inset 0 -4px #5b9bd5;
+    border-bottom-width: 4px;
   }
 
   .blue-cell.wall-right.wall-bottom {
-    box-shadow: inset -4px 0 #5b9bd5, inset 0 -4px #5b9bd5;
+    border-right-width: 4px;
+    border-bottom-width: 4px;
   }
 }
 
