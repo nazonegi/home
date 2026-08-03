@@ -638,17 +638,26 @@ button.yellow-cell-content {
   background: #dcecf8;
 }
 
-.blue-cell.wall-right {
-  border-right: 7px solid #5b9bd5;
+.blue-wall {
+  position: absolute;
+  z-index: 4;
+  display: block;
+  background: #5b9bd5;
+  pointer-events: none;
 }
 
-.blue-cell.wall-bottom {
-  border-bottom: 7px solid #5b9bd5;
+.blue-wall-right {
+  top: 0;
+  right: 0;
+  width: 7px;
+  height: 100%;
 }
 
-.blue-cell.wall-right.wall-bottom {
-  border-right: 7px solid #5b9bd5;
-  border-bottom: 7px solid #5b9bd5;
+.blue-wall-bottom {
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 7px;
 }
 
 .blue-cell.selected::after {
@@ -754,17 +763,12 @@ button.yellow-cell-content {
     inset: 4px;
   }
 
-  .blue-cell.wall-right {
-    border-right-width: 4px;
+  .blue-wall-right {
+    width: 4px;
   }
 
-  .blue-cell.wall-bottom {
-    border-bottom-width: 4px;
-  }
-
-  .blue-cell.wall-right.wall-bottom {
-    border-right-width: 4px;
-    border-bottom-width: 4px;
+  .blue-wall-bottom {
+    height: 4px;
   }
 }
 
