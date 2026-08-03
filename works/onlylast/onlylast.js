@@ -7,15 +7,6 @@ const blueBoardRows = [
   ["や", "も", { image: "blue/i1.svg", value: "イラスト", label: "イラスト" }, "ご", "を", "で", { image: "blue/i2.svg", value: "イラスト", label: "イラスト" }, "く", "う"]
 ];
 
-function sendOnlylastAnalyticsEvent(eventName) {
-  if (typeof gtag !== "function") return;
-  gtag("event", eventName, { work_id: "onlylast" });
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  if (E("answerButton")) sendOnlylastAnalyticsEvent("game_start");
-});
-
 const blueSpecialCells = new Set(["1,3", "2,7", "3,6", "4,9", "6,3", "6,7"]);
 const blueBottomWalls = new Set(["1,3", "1,7", "4,2", "4,6", "5,5", "5,8"]);
 const blueRightWalls = new Set(["2,3", "2,5", "3,1", "3,7", "3,8", "4,2"]);
@@ -78,7 +69,6 @@ check = function checkOnlylast() {
   });
 
   if (allSolved) {
-    sendOnlylastAnalyticsEvent("game_clear");
     clearModal();
     return;
   }

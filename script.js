@@ -2,7 +2,7 @@ let gameData, currentQuestionIndex = 0, unlockedIndex = 0, currentNoticeIndex = 
 document.addEventListener("DOMContentLoaded", async () => { try { if (E("workList")) await home(); else { gameData = await (await fetch("data.json")).json(); validate(); if (E("titlePage")) title(); else game() } } catch (e) { document.body.insertAdjacentHTML("afterbegin", `<p class="ng">${esc(e.message)}</p>`) } }); const stars = n => "★".repeat(n) + "☆".repeat(5 - n);
 async function home() { let works = await (await fetch("works.json")).json(); for (const x of works) { let d = await (await fetch(`works/${x.folder}/data.json`)).json(); E("workList").insertAdjacentHTML("beforeend", `<a class="work" href="works/${x.folder}/"><img src="works/${x.folder}/images/${esc(d.titleImage)}"><div class="workbody"><h3>${esc(d.title)}</h3><div class="meta"><span>${stars(d.difficulty)}</span><span>${esc(d.time)}</span></div></div></a>`) } } function title() { document.title = gameData.title; E("gameTitle").textContent = gameData.title; E("intro").textContent = gameData.intro; E("difficulty").textContent = stars(gameData.difficulty); E("time").textContent = gameData.time; E("howToPlay").textContent = gameData.howToPlay; E("titleImage").src = `images/${gameData.titleImage}`; for (const n of gameData.notice || []) E("noticeList").insertAdjacentHTML("beforeend", `<li>${esc(n)}</li>`) }
 function game() {
-  restore(); document.title = gameData.title; E("answerButton").onclick = check; E("answerInput").onkeydown = e => { if (e.key === "Enter") check() }; E("noticeButton").onclick = noticeConfirm; E("prevButton").onclick = () => move(currentQuestionIndex - 1); E("nextButton").onclick = () => move(currentQuestionIndex + 1); E("progressResetButton").onclick = resetConfirm;
+  restore(); window.trackGameEvent?.("game_start", gameData.id); document.title = gameData.title; E("answerButton").onclick = check; E("answerInput").onkeydown = e => { if (e.key === "Enter") check() }; E("noticeButton").onclick = noticeConfirm; E("prevButton").onclick = () => move(currentQuestionIndex - 1); E("nextButton").onclick = () => move(currentQuestionIndex + 1); E("progressResetButton").onclick = resetConfirm;
 
   E("modalClose").onclick = closeModal;
 
@@ -84,6 +84,7 @@ function notice() {
 }
 function resetConfirm() { modal('<h2>進捗リセット</h2><p>進捗をリセットしますか？</p><p>これまでの解放状況と回答履歴が削除されます。</p><div class="modalactions"><button id="doReset">リセットする</button><button id="cancelReset">キャンセル</button></div>'); E("doReset").onclick = () => { localStorage.removeItem(key()); currentQuestionIndex = unlockedIndex = 0; submittedAnswers = {}; closeModal(); render() }; E("cancelReset").onclick = closeModal }
 function clearModal() {
+  window.trackGameEvent?.("game_clear", gameData.id);
   const e = gameData.ending || {};
   const shareUrl = new URL(".", location.href).href;
   const text = `${e.tweetText || ""}\n${shareUrl}`;

@@ -7,7 +7,7 @@ async function home(){let works=await (await fetch("works.json")).json();for(con
 function title(){document.title=gameData.title;E("gameTitle").textContent=gameData.title;E("intro").textContent=gameData.intro;E("difficulty").textContent=stars(gameData.difficulty);E("time").textContent=gameData.time;E("howToPlay").textContent=gameData.howToPlay;E("titleImage").src=`images/${gameData.titleImage}`;for(const n of gameData.notice||[])E("noticeList").insertAdjacentHTML("beforeend",`<li>${esc(n)}</li>`)}
 
 function game(){
-  restore();document.title=gameData.title;
+  restore();window.trackGameEvent?.("game_start",gameData.id);document.title=gameData.title;
   E("answerButton").onclick=check;
   E("answerInput").onkeydown=e=>{if(e.key==="Enter")check()};
   E("noticeButton").onclick=noticeConfirm;
@@ -183,6 +183,7 @@ function notice(){let ns=gameData.questions[currentQuestionIndex].notices||[];if
 function resetConfirm(){modal('<h2>進捗リセット</h2><p>進捗をリセットしますか？</p><p>これまでの解放状況と回答履歴が削除されます。</p><div class="modalactions"><button id="doReset">リセットする</button><button id="cancelReset">キャンセル</button></div>');E("doReset").onclick=()=>{localStorage.removeItem(key());currentQuestionIndex=unlockedIndex=0;submittedAnswers={};squareState={placements:{q1:["","","",""],q2:["","","",""],q3:["","","",""],q4:["","","",""]},completed:{q1:false,q2:false,q3:false,q4:false},lastRevealed:false};closeModal();render()};E("cancelReset").onclick=closeModal}
 
 function clearModal() {
+  window.trackGameEvent?.("game_clear",gameData.id);
   const e = gameData.ending || {};
 
   // game.html を除いた作品トップURL
