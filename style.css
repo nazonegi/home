@@ -28,6 +28,43 @@ body {
     width: min(880px, calc(100% - 24px))
 }
 
+.home-banner {
+    display: flex;
+    width: 100vw;
+    min-height: 56px;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    margin: 0 0 18px calc(50% - 50vw);
+    padding: 8px 16px;
+    background: linear-gradient(90deg, #347d29, #55a934);
+    box-shadow: 0 4px 14px #24481840;
+    color: #fff;
+    font-weight: 800;
+    text-decoration: none;
+    transition: background-color .2s, transform .2s
+}
+
+.home-banner:hover {
+    background: linear-gradient(90deg, #2d7024, #48962d)
+}
+
+.home-banner:focus-visible {
+    outline: 3px solid #75a92d;
+    outline-offset: 3px
+}
+
+.home-banner img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover
+}
+
+#titlePage {
+    padding-top: 0
+}
+
 .hero {
     text-align: center
 }
