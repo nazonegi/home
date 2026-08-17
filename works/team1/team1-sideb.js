@@ -21,6 +21,7 @@
   let mazePosition = [0, 4];
   let routeText = "";
   let lastConfig = { roundDurationSeconds: 300, blackCurtainEnabled: true };
+  let clearConfig = {};
   let lastRoundKey = null;
   let lastModel = null;
   let lastSprites = [];
@@ -68,6 +69,7 @@
     restoreMaze();
     updateQuestionNav();
     initLast();
+    loadClearConfig();
     requestAnimationFrame(animateZodiac);
     window.setInterval(decayCurtain, 100);
   }
@@ -427,6 +429,27 @@
       return;
     }
     window.trackGameEvent?.("game_clear", "team1");
-    openModal('<div class="clear"><h1>CLEAR</h1><h2>脱出成功！</h2><p>二人で力を合わせ、すべての謎を解き明かした！</p><p class="thanks">THANK YOU FOR PLAYING</p><div class="clear-home-link"><a href="../../">なぞねぎ脱出へ</a></div></div>');
+    showClear();
+  }
+
+  async function loadClearConfig() {
+    try {
+      const response = await fetch("clear-config.json", { cache: "no-store" });
+      if (response.ok) clearConfig = await response.json();
+    } catch (_) { /* Use fallback copy if the JSON cannot be loaded. */ }
+  }
+
+  function escapeHTML(value) {
+    return String(value || "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+  }
+
+  function showClear() {
+    const ending = clearConfig.sideB || {};
+    const image = ending.image || "images/sideB/clear-nasu.png";
+    const message = ending.message || "なぞなすとして、二人で部屋から脱出した！";
+    const postText = ending.postText || "『協力しないと出られない部屋からの脱出』をクリアしました！";
+    const shareUrl = new URL(".", location.href).href;
+    const postUrl = `https://x.com/intent/post?text=${encodeURIComponent(`${postText}\n${shareUrl}`)}`;
+    openModal(`<div class="clear"><h1>CLEAR</h1><h2>脱出成功！</h2><img class="clearimg" src="${escapeHTML(image)}" alt="なぞなすのクリア画像"><p>${escapeHTML(message)}</p><a class="tweet" href="${postUrl}" target="_blank" rel="noopener noreferrer">クリアポスト</a><p class="thanks">THANK YOU FOR PLAYING</p><div class="clear-home-link"><a href="../../">なぞねぎ脱出へ</a></div></div>`);
   }
 })();

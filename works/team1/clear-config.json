@@ -1,0 +1,13 @@
+{
+  "version": "1.0",
+  "sideA": {
+    "image": "images/sideA/clear-negi.png",
+    "message": "なぞねぎとして、二人で部屋から脱出した！協力は爆発だ！！",
+    "postText": "『協力しないと出られない部屋からの脱出』を、なぞねぎとしてクリアしました！\n\n#ねぎなぞ脱出 #謎解き #Web謎"
+  },
+  "sideB": {
+    "image": "images/sideB/clear-nasu.png",
+    "message": "なぞなすとして、二人で部屋から脱出した！今日は疲れたからもう寝る",
+    "postText": "『協力しないと出られない部屋からの脱出』を、なぞなすとしてクリアしました！\n\n#ねぎなぞ脱出 #謎解き #Web謎"
+  }
+}
