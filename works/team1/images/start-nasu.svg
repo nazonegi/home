@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="360" viewBox="0 0 800 360" role="img" aria-labelledby="title">
+  <title id="title">なぞなすとしてゲームを始める</title>
+  <rect width="800" height="360" rx="24" fill="#f1e9f5"/>
+  <circle cx="155" cy="180" r="105" fill="#73508c"/><text x="155" y="205" text-anchor="middle" fill="#fff" font-family="sans-serif" font-size="62" font-weight="900">なす</text>
+  <text x="485" y="145" text-anchor="middle" fill="#513668" font-family="sans-serif" font-size="38" font-weight="800">なぞなすとして</text>
+  <text x="485" y="215" text-anchor="middle" fill="#513668" font-family="sans-serif" font-size="46" font-weight="900">ゲームを始める</text>
+  <text x="715" y="205" text-anchor="middle" fill="#73508c" font-family="sans-serif" font-size="62" font-weight="900">›</text>
+</svg>

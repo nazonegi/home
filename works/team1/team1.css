@@ -1,0 +1,530 @@
+:root {
+  --team-green: #397a43;
+  --team-purple: #73508c;
+}
+
+.team-intro h1,
+.team-intro > p,
+.role-guide {
+  text-align: center;
+}
+
+.team-intro ol {
+  width: min(650px, 100%);
+  margin: 0 auto;
+}
+
+.role-guide {
+  margin: 34px 0 16px;
+  font-weight: 800;
+}
+
+.role-select {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.role-card {
+  display: block;
+  overflow: hidden;
+  border: 4px solid transparent;
+  border-radius: 20px;
+  box-shadow: 0 8px 18px #40281424;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.role-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px #40281435;
+}
+
+.role-card:focus-visible {
+  outline: 4px solid #d8b36d;
+  outline-offset: 3px;
+}
+
+.role-a { border-color: var(--team-green); }
+.role-b { border-color: var(--team-purple); }
+.role-card img { display: block; width: 100%; height: auto; }
+
+.side-page { min-height: 100vh; }
+.side-a { background: #e7f3e8; }
+.side-b { background: #f0e8f5; }
+
+.side-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 4px;
+  font-weight: 800;
+}
+
+.side-header a { color: inherit; }
+.side-header span { color: var(--muted); font-size: 13px; letter-spacing: .12em; }
+.side-card { text-align: center; }
+.side-card h1 { margin: 0; font-size: clamp(36px, 8vw, 64px); }
+.side-kicker { margin-bottom: 0; color: var(--muted); font-weight: 800; }
+.side-character { display: block; width: min(220px, 58vw); margin: 18px auto; }
+
+.nasu-placeholder {
+  display: grid;
+  width: min(200px, 52vw);
+  aspect-ratio: 1;
+  place-items: center;
+  margin: 18px auto;
+  border: 8px solid #513668;
+  border-radius: 48% 52% 45% 55%;
+  background: var(--team-purple);
+  color: #fff;
+  font-size: clamp(34px, 10vw, 58px);
+  font-weight: 900;
+}
+
+.waiting-message {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: #efe1c8;
+  font-weight: 800;
+}
+
+.team-game { width: min(760px, calc(100% - 24px)); }
+
+.q1-card { overflow: hidden; }
+
+.letter-grid {
+  display: grid;
+  width: min(100%, 500px);
+  grid-template-columns: repeat(5, 1fr);
+  margin: 22px auto 28px;
+  border-top: 1px solid #9a9a9a;
+  border-left: 1px solid #9a9a9a;
+}
+
+.letter-cell {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1;
+  place-items: center;
+  padding: 0;
+  border-right: 1px solid #9a9a9a;
+  border-bottom: 1px solid #9a9a9a;
+  border-radius: 0;
+  background: #fff;
+  color: #111;
+  font: 700 clamp(22px, 6vw, 38px)/1 "Yu Gothic", sans-serif;
+  touch-action: manipulation;
+}
+
+.letter-cell:hover { background: #eee; }
+.letter-cell.is-black,
+.letter-cell.is-black:hover { background: #111; color: #111; }
+.letter-cell:focus-visible { position: relative; z-index: 2; outline: 4px solid #d8b36d; outline-offset: -4px; }
+
+.image-lane {
+  position: relative;
+  width: min(100%, 500px);
+  height: clamp(92px, 20vw, 150px);
+  margin: 0 auto;
+  overflow: hidden;
+  border: 3px solid #222;
+  background: #fff;
+}
+
+.image-lane [data-runner="A"] { z-index: 4; }
+.image-lane [data-runner="B"] { z-index: 3; }
+.image-lane [data-runner="C"] { z-index: 2; }
+.image-lane [data-runner="D"] { z-index: 1; }
+
+.image-lane img {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: clamp(68px, 15vw, 112px);
+  height: clamp(68px, 15vw, 112px);
+  margin: auto 0;
+  object-fit: contain;
+  opacity: 0;
+  transform: translateX(110%);
+}
+
+.q1-instruction {
+  margin: 18px 0 14px;
+  text-align: center;
+  color: #111;
+  font-size: clamp(24px, 6vw, 38px);
+  font-weight: 900;
+  line-height: 1.4;
+  letter-spacing: .06em;
+}
+
+.side-b .q1-instruction {
+  color: #fff;
+  -webkit-text-stroke: 2px #111;
+  paint-order: stroke fill;
+  text-shadow: 1px 1px 0 #111, -1px 1px 0 #111, 1px -1px 0 #111, -1px -1px 0 #111;
+}
+
+.side-b .image-lane [data-runner="D"] {
+  width: clamp(130px, 27vw, 200px);
+}
+
+.lane-fullscreen-button,
+.lane-fullscreen-close {
+  display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .lane-fullscreen-button {
+    display: block;
+    margin: 10px auto 0;
+    padding: 10px 22px;
+    border: 2px solid #111;
+    border-radius: 999px;
+    background: #fff;
+    color: #111;
+    font-weight: 800;
+  }
+
+  .image-lane.is-mobile-expanded,
+  .image-lane:fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    border: 0;
+    background: #fff;
+  }
+
+  .image-lane.is-mobile-expanded .lane-fullscreen-close,
+  .image-lane:fullscreen .lane-fullscreen-close {
+    display: grid;
+    position: absolute;
+    top: max(10px, env(safe-area-inset-top));
+    right: max(10px, env(safe-area-inset-right));
+    z-index: 20;
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    place-items: center;
+    border: 2px solid #111;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .9);
+    color: #111;
+    font-size: 30px;
+    line-height: 1;
+  }
+
+  .image-lane.is-mobile-expanded img,
+  .image-lane:fullscreen img {
+    width: clamp(90px, 18vh, 160px);
+    height: clamp(90px, 18vh, 160px);
+  }
+
+  .side-b .image-lane.is-mobile-expanded [data-runner="D"],
+  .side-b .image-lane:fullscreen [data-runner="D"] {
+    width: clamp(180px, 38vh, 340px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image-lane::after {
+    content: "この謎では画像が動きます";
+    position: absolute;
+    inset: auto 0 0;
+    padding: 2px 8px;
+    background: #fff9;
+    color: #555;
+    font-size: 12px;
+    text-align: center;
+  }
+}
+
+.team-pager { margin: 18px 0; }
+#questionSteps { display: flex; gap: 9px; }
+
+.coop-maze-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.partner-maze-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 0;
+}
+
+.zoom-image-button {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.maze-controller {
+  display: grid;
+  width: min(320px, 92vw);
+  aspect-ratio: 1;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  place-items: center;
+  margin: 0 auto;
+  border: 6px solid var(--team-green);
+  background: #fff;
+}
+
+.maze-controller button {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #111;
+}
+
+.direction-triangle {
+  display: block;
+  width: 0;
+  height: 0;
+  border-right: clamp(30px, 9vw, 42px) solid transparent;
+  border-bottom: clamp(46px, 13vw, 62px) solid #111;
+  border-left: clamp(30px, 9vw, 42px) solid transparent;
+  transform-origin: 50% 60%;
+}
+
+.maze-controller [data-move="right"] .direction-triangle { transform: rotate(90deg); }
+.maze-controller [data-move="down"] .direction-triangle { transform: rotate(180deg); }
+.maze-controller [data-move="left"] .direction-triangle { transform: rotate(-90deg); }
+
+.maze-controller [data-move="up"] { grid-column: 2; grid-row: 1; }
+.maze-controller [data-move="left"] { grid-column: 1; grid-row: 2; }
+.controller-player { grid-column: 2; grid-row: 2; width: clamp(44px, 12vw, 58px); aspect-ratio: 1; object-fit: contain; }
+.maze-controller [data-move="right"] { grid-column: 3; grid-row: 2; }
+.maze-controller [data-move="down"] { grid-column: 2; grid-row: 3; }
+
+.route-guide {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(4px, 1.5vw, 12px);
+  width: min(100%, 680px);
+  margin: 28px auto 14px;
+}
+
+.route-node {
+  position: relative;
+  display: grid;
+  width: 100%;
+  aspect-ratio: 1;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.route-node:not(:last-child)::after {
+  content: "→";
+  position: absolute;
+  left: calc(100% + 1px);
+  top: 50%;
+  transform: translateY(-50%);
+  color: #333;
+  font-size: clamp(18px, 4vw, 28px);
+  font-weight: 900;
+}
+
+.route-node img { display: block; width: 100%; height: 100%; object-fit: contain; }
+
+.route-text {
+  min-height: 62px;
+  padding: 8px 14px;
+  border: 3px solid var(--team-green);
+  background: #fff;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: .15em;
+  text-align: center;
+  word-break: break-all;
+}
+
+.q2-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; }
+.q2-actions #mazeResetButton { background: #e3e3e3; color: #333; }
+.q2-actions #mazeAnswerButton { background: #9dcc65; }
+
+.side-b .maze-controller,
+.side-b .route-text {
+  border-color: var(--team-purple);
+}
+
+.side-b .q2-actions #mazeAnswerButton {
+  background: var(--team-purple);
+  color: #fff;
+}
+
+@media (max-width: 700px) {
+  .coop-maze-layout { grid-template-columns: 1fr; }
+  .partner-maze-image { width: min(100%, 430px); margin: 0 auto; }
+}
+
+.zodiac-stage {
+  position: relative;
+  width: 100%;
+  height: clamp(320px, 58vw, 460px);
+  margin-top: 18px;
+  overflow: hidden;
+  border: 4px solid #222;
+  background: #fff1cf;
+}
+
+.zodiac-sprite {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform;
+}
+
+.zodiac-curtain {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: #000;
+  color: #fff;
+  font-size: clamp(34px, 8vw, 64px);
+  font-weight: 900;
+  letter-spacing: .12em;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.round-timer {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  margin: 10px 0 22px;
+  font-weight: 900;
+}
+
+.round-timer progress {
+  width: 100%;
+  height: 22px;
+  accent-color: var(--team-green);
+}
+
+.round-timer span { min-width: 82px; font-variant-numeric: tabular-nums; }
+
+.kana-key {
+  overflow: hidden;
+  border: 3px solid #333;
+  background: #fff;
+}
+
+.kana-numbers,
+.kana-letters {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.kana-numbers { border-bottom: 2px solid #333; }
+.kana-key span {
+  display: grid;
+  min-width: 0;
+  min-height: 42px;
+  place-items: center;
+  border-right: 1px solid #aaa;
+  font-size: clamp(12px, 2.8vw, 18px);
+  font-weight: 900;
+}
+.kana-key span:last-child { border-right: 0; }
+
+.last-targets {
+  display: flex;
+  justify-content: center;
+  gap: clamp(24px, 8vw, 70px);
+  margin: 26px 0 22px;
+}
+
+.last-target {
+  position: relative;
+  display: grid;
+  width: clamp(110px, 25vw, 170px);
+  aspect-ratio: 1;
+  place-items: center;
+  border: 4px solid var(--team-green);
+  border-radius: 18px;
+  background: #fff;
+}
+
+.last-target img { width: 88%; height: 88%; object-fit: contain; }
+.last-target span {
+  position: absolute;
+  top: -14px;
+  left: -14px;
+  z-index: 2;
+  display: grid;
+  width: 40px;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--team-green);
+  color: #fff;
+  font-weight: 900;
+}
+
+.last-answer-area { display: flex; gap: 10px; }
+.last-answer-area input {
+  flex: 1;
+  min-width: 0;
+  min-height: 52px;
+  padding: 10px 14px;
+  border: 2px solid #cab896;
+  border-radius: 12px;
+  font-size: 20px;
+}
+
+@media (max-width: 560px) {
+  .zodiac-stage { height: 390px; }
+  .kana-key { overflow-x: auto; }
+  .kana-numbers,
+  .kana-letters { min-width: 540px; }
+  .last-answer-area { flex-direction: column; }
+}
+
+@media (max-width: 650px) {
+  .role-select { grid-template-columns: 1fr; }
+  .side-header { align-items: flex-start; flex-direction: column; }
+}

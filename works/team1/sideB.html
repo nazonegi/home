@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="../../favicon.ico" sizes="any">
+  <title>Q1 なぞなす｜二人協力しないと出られない部屋からの脱出</title>
+  <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="team1.css">
+  <script src="../../analytics.js"></script>
+</head>
+<body class="side-page side-b">
+  <main class="container game team-game">
+    <header class="side-header">
+      <a href="index.html">← タイトルに戻る</a>
+      <span>TEAM 1 / SIDE B</span>
+    </header>
+
+    <section id="question1" class="card q1-card game-question">
+      <div class="question-header">
+        <h1 class="qlabel">Q1</h1>
+        <button id="noticeButton" class="notice-link" type="button">気づく</button>
+      </div>
+      <p class="q1-instruction">あわせてできる文字を読め</p>
+      <div id="letterGrid" class="letter-grid" aria-label="ひらがなのマス"></div>
+      <div id="imageLane" class="image-lane" aria-label="右から左へ流れる4つの絵">
+        <img data-runner="A" alt="こけし">
+        <img data-runner="B" alt="ないと">
+        <img data-runner="C" alt="とりお">
+        <img data-runner="D" alt="まむし">
+        <button id="laneFullscreenClose" class="lane-fullscreen-close" type="button" aria-label="拡大表示を閉じる">×</button>
+      </div>
+      <button id="laneFullscreenButton" class="lane-fullscreen-button" type="button">拡大</button>
+    </section>
+
+    <section id="question2" class="card q2-card game-question hidden">
+      <div class="question-header">
+        <h1 class="qlabel">Q2</h1>
+        <button id="q2NoticeButton" class="notice-link" type="button">気づく</button>
+      </div>
+
+      <div class="coop-maze-layout">
+        <div>
+          <button class="zoom-image-button" type="button" aria-label="なぞねぎの迷路を拡大">
+            <img class="partner-maze-image zoomable-image" src="images/sideB/q2-negi-maze.png" alt="なぞねぎの迷路">
+          </button>
+        </div>
+        <div>
+          <div class="maze-controller" aria-label="なぞなすの迷路操作">
+            <button type="button" data-move="up" aria-label="上へ進む"><span class="direction-triangle" aria-hidden="true"></span></button>
+            <button type="button" data-move="left" aria-label="左へ進む"><span class="direction-triangle" aria-hidden="true"></span></button>
+            <img class="controller-player" src="images/sideB/nasu-player-marker.png" alt="">
+            <button type="button" data-move="right" aria-label="右へ進む"><span class="direction-triangle" aria-hidden="true"></span></button>
+            <button type="button" data-move="down" aria-label="下へ進む"><span class="direction-triangle" aria-hidden="true"></span></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="route-guide" aria-label="Sから4つの画像を通ってG">
+        <button class="route-node" type="button" aria-label="Sの画像を拡大"><img class="zoomable-image" src="images/sideB/q2-route-start.png" alt="S"></button>
+        <button class="route-node" type="button" aria-label="経路画像1を拡大"><img class="zoomable-image" src="images/sideB/q2-route-1.png" alt="骨"></button>
+        <button class="route-node" type="button" aria-label="経路画像2を拡大"><img class="zoomable-image" src="images/sideB/q2-route-2.png" alt="魚"></button>
+        <button class="route-node" type="button" aria-label="経路画像3を拡大"><img class="zoomable-image" src="images/sideB/q2-route-3.png" alt="黒い棒"></button>
+        <button class="route-node" type="button" aria-label="経路画像4を拡大"><img class="zoomable-image" src="images/sideB/q2-route-4.png" alt="交差した道具"></button>
+        <button class="route-node" type="button" aria-label="Gの画像を拡大"><img class="zoomable-image" src="images/sideB/q2-route-goal.png" alt="G"></button>
+      </div>
+      <div id="routeText" class="route-text" aria-live="polite" aria-label="経路で得たひらがな"></div>
+      <div class="q2-actions">
+        <button id="mazeResetButton" type="button">リセット</button>
+        <button id="mazeAnswerButton" type="button">決定</button>
+      </div>
+      <p id="mazeMessage" class="ng" aria-live="polite"></p>
+    </section>
+
+    <section id="questionLast" class="card last-card game-question hidden">
+      <div class="question-header">
+        <h1 class="qlabel">Q3</h1>
+        <button id="lastNoticeButton" class="notice-link" type="button">気づく</button>
+      </div>
+
+      <div id="zodiacStage" class="zodiac-stage" aria-label="動き回る十二支の動物"></div>
+      <div class="round-timer">
+        <progress id="roundProgress" max="300" value="300"></progress>
+        <span id="roundTimeText">残り 5:00</span>
+      </div>
+
+      <div class="kana-key" aria-label="数字とひらがなの対応">
+        <div class="kana-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span></div>
+        <div class="kana-letters"><span>か</span><span>い</span><span>う</span><span>み</span><span>こ</span><span>と</span><span>き</span><span>は</span><span>ま</span><span>し</span><span>た</span><span>え</span></div>
+      </div>
+
+      <div id="lastTargets" class="last-targets" aria-label="数える動物"></div>
+      <div class="last-answer-area">
+        <input id="lastAnswerInput" autocomplete="off" placeholder="答えを入力" aria-label="Q3の答え">
+        <button id="lastAnswerButton" type="button">決定</button>
+      </div>
+      <p id="lastWrongMessage" class="ng" aria-live="polite"></p>
+    </section>
+
+    <nav class="pager team-pager" aria-label="問題の切り替え">
+      <button id="prevQuestionButton" type="button" aria-label="前の問題">◀</button>
+      <div id="questionSteps">
+        <button class="dot current" type="button" data-question="0" aria-label="Q1"></button>
+        <button class="dot" type="button" data-question="1" aria-label="Q2" disabled></button>
+        <button class="dot" type="button" data-question="2" aria-label="Q3" disabled></button>
+      </div>
+      <button id="nextQuestionButton" type="button" aria-label="次の問題" disabled>▶</button>
+    </nav>
+
+    <section id="q1AnswerCard" class="card answer">
+      <h2>こたえ</h2>
+      <div class="answerrow">
+        <input id="answerInput" autocomplete="off" placeholder="答えを入力" aria-label="答え">
+        <button id="answerButton" type="button">決定</button>
+      </div>
+      <p id="wrongMessage" class="ng" aria-live="polite"></p>
+      <div class="resetarea"><button id="progressResetButton" class="resetlink" type="button">進捗リセット</button></div>
+    </section>
+  </main>
+
+  <div id="modal" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modalbox">
+      <button id="modalClose" class="close" type="button" aria-label="閉じる">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+  <div id="viewer" class="overlay viewer hidden" role="dialog" aria-modal="true" aria-label="画像の拡大表示">
+    <button id="viewerClose" class="close" type="button" aria-label="閉じる">×</button>
+    <img id="viewerImage" alt="">
+  </div>
+  <script src="team1-last-algorithm.js"></script>
+  <script src="team1-sideb.js"></script>
+</body>
+</html>

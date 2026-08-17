@@ -1,0 +1,21 @@
+{
+  "version": "1.0",
+  "id": "team1",
+  "title": "二人協力しないと出られない部屋からの脱出",
+  "author": "なぞねぎ",
+  "difficulty": 0,
+  "time": "未定",
+  "titleImage": "title.svg",
+  "gameType": "two-player-cooperative",
+  "sides": {
+    "A": {
+      "name": "なぞねぎ",
+      "page": "sideA.html"
+    },
+    "B": {
+      "name": "なぞなす",
+      "page": "sideB.html"
+    }
+  },
+  "questions": []
+}
