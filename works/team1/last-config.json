@@ -1,5 +1,5 @@
 {
   "version": "1.0",
-  "roundDurationSeconds": 300,
-  "blackCurtainEnabled": false
+  "roundDurationSeconds": 60,
+  "blackCurtainEnabled": true
 }
