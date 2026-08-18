@@ -4,15 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="../../favicon.ico" sizes="any">
-  <title>なぞねぎ側｜二人協力しないと出られない部屋からの脱出</title>
+  <title>なぞねぎ側｜協力しないと出られない部屋からの脱出</title>
   <meta name="description" content="二人で別々の画面を見て、情報を共有しながら挑む協力型のブラウザ謎解きゲームです。">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="二人協力しないと出られない部屋からの脱出｜なぞねぎ脱出">
+  <meta property="og:title" content="協力しないと出られない部屋からの脱出｜なぞねぎ脱出">
   <meta property="og:description" content="二人で別々の画面を見て、情報を共有しながら挑む協力型のブラウザ謎解きゲームです。">
   <meta property="og:url" content="https://nazonegi.github.io/home/works/team1/">
   <meta property="og:image" content="https://nazonegi.github.io/home/works/team1/images/title.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="二人協力しないと出られない部屋からの脱出｜なぞねぎ脱出">
+  <meta name="twitter:title" content="協力しないと出られない部屋からの脱出｜なぞねぎ脱出">
   <meta name="twitter:description" content="二人で別々の画面を見て、情報を共有しながら挑む協力型のブラウザ謎解きゲームです。">
   <meta name="twitter:image" content="https://nazonegi.github.io/home/works/team1/images/title.png">
   <link rel="stylesheet" href="../../style.css">
@@ -45,7 +45,7 @@
         <button id="laneFullscreenClose" class="lane-fullscreen-close" type="button" aria-label="拡大表示を閉じる">×</button>
       </div>
       <button id="laneFullscreenButton" class="lane-fullscreen-button" type="button">拡大</button>
-
+      <footer class="question-footer"><button class="progress-reset-button resetlink" type="button">進捗リセット</button></footer>
     </section>
 
     <section id="question2" class="card q2-card game-question hidden">
@@ -86,6 +86,7 @@
         <button id="mazeAnswerButton" type="button">決定</button>
       </div>
       <p id="mazeMessage" class="ng" aria-live="polite"></p>
+      <footer class="question-footer"><button class="progress-reset-button resetlink" type="button">進捗リセット</button></footer>
     </section>
 
     <section id="questionLast" class="card last-card game-question hidden">
@@ -101,8 +102,18 @@
       </div>
 
       <div class="kana-key" aria-label="数字とひらがなの対応">
-        <div class="kana-numbers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span></div>
-        <div class="kana-letters"><span>か</span><span>い</span><span>う</span><span>み</span><span>こ</span><span>と</span><span>き</span><span>は</span><span>ま</span><span>し</span><span>た</span><span>え</span></div>
+        <div class="kana-pair"><span>1</span><span>か</span></div>
+        <div class="kana-pair"><span>2</span><span>い</span></div>
+        <div class="kana-pair"><span>3</span><span>う</span></div>
+        <div class="kana-pair"><span>4</span><span>み</span></div>
+        <div class="kana-pair"><span>5</span><span>こ</span></div>
+        <div class="kana-pair"><span>6</span><span>と</span></div>
+        <div class="kana-pair"><span>7</span><span>き</span></div>
+        <div class="kana-pair"><span>8</span><span>は</span></div>
+        <div class="kana-pair"><span>9</span><span>ま</span></div>
+        <div class="kana-pair"><span>10</span><span>し</span></div>
+        <div class="kana-pair"><span>11</span><span>た</span></div>
+        <div class="kana-pair"><span>12</span><span>え</span></div>
       </div>
 
       <div id="lastTargets" class="last-targets" aria-label="数える動物"></div>
@@ -112,6 +123,7 @@
         <button id="lastAnswerButton" type="button">決定</button>
       </div>
       <p id="lastWrongMessage" class="ng" aria-live="polite"></p>
+      <footer class="question-footer"><button class="progress-reset-button resetlink" type="button">進捗リセット</button></footer>
     </section>
 
     <nav class="pager team-pager" aria-label="問題の切り替え">
@@ -131,7 +143,6 @@
         <button id="answerButton" type="button">決定</button>
       </div>
       <p id="wrongMessage" class="ng" aria-live="polite"></p>
-      <div class="resetarea"><button id="progressResetButton" class="resetlink" type="button">進捗リセット</button></div>
     </section>
   </main>
 

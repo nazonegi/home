@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const LETTERS = ["の", "と", "い", "ろ", "に", "も", "ど", "お", "く", "た", "よ", "ん", "ぶ", "め", "ま"];
+  const LETTERS = ["の", "と", "い", "ろ", "に", "も", "ど", "お", "く", "た", "よ", "ん", "ふ", "め", "ま"];
   const RUNNERS = [
     { id: "A", file: "a-kokeshi.png", duration: 5 },
     { id: "B", file: "b-knight.png", duration: 1 },
@@ -22,6 +22,8 @@
   let routeText = "";
   let lastConfig = { roundDurationSeconds: 300, blackCurtainEnabled: true };
   let clearConfig = {};
+  let noticeConfig = {};
+  let clockOffsetMs = 0;
   let lastRoundKey = null;
   let lastModel = null;
   let lastSprites = [];
@@ -38,6 +40,7 @@
   document.addEventListener("DOMContentLoaded", init);
 
   function init() {
+    window.trackGameEvent?.("game_start", "team1_sideB");
     buildGrid();
     restore();
     setupImages();
@@ -45,16 +48,16 @@
     window.setInterval(runCycle, CYCLE_SECONDS * 1000);
     E("answerButton").addEventListener("click", checkAnswer);
     E("answerInput").addEventListener("keydown", event => { if (event.key === "Enter") checkAnswer(); });
-    E("noticeButton").addEventListener("click", () => openModal("<h2 id=\"modalTitle\">気づく</h2><p>まずは二人で、お互いの画面に流れる絵について話してみよう。</p>"));
-    E("progressResetButton").addEventListener("click", showResetConfirm);
+    E("noticeButton").addEventListener("click", () => showNotice("q1"));
+    document.querySelectorAll(".progress-reset-button").forEach(button => button.addEventListener("click", showResetConfirm));
     E("laneFullscreenButton").addEventListener("click", openLaneFullscreen);
     E("laneFullscreenClose").addEventListener("click", closeLaneFullscreen);
     document.addEventListener("fullscreenchange", updateLaneFullscreen);
-    E("q2NoticeButton").addEventListener("click", () => openModal('<h2 id="modalTitle">気づく</h2><p>自分の迷路は相手の画面にあります。相手の案内を聞いて、上下左右のボタンを押そう。</p>'));
+    E("q2NoticeButton").addEventListener("click", () => showNotice("q2"));
     document.querySelectorAll("[data-move]").forEach(button => button.addEventListener("click", () => moveMaze(button.dataset.move)));
     E("mazeResetButton").addEventListener("click", resetMaze);
     E("mazeAnswerButton").addEventListener("click", checkMazeAnswer);
-    E("lastNoticeButton").addEventListener("click", () => openModal('<h2 id="modalTitle">気づく</h2><p>指定された動物が、それぞれ何匹いるか数えてみよう。</p>'));
+    E("lastNoticeButton").addEventListener("click", () => showNotice("last"));
     E("lastAnswerButton").addEventListener("click", checkLastAnswer);
     E("lastAnswerInput").addEventListener("keydown", event => { if (event.key === "Enter") checkLastAnswer(); });
     document.querySelectorAll(".zoom-image-button, .route-node").forEach(button => button.addEventListener("click", () => openViewer(button.querySelector(".zoomable-image"))));
@@ -70,6 +73,7 @@
     updateQuestionNav();
     initLast();
     loadClearConfig();
+    loadNoticeConfig();
     requestAnimationFrame(animateZodiac);
     window.setInterval(decayCurtain, 100);
   }
@@ -170,21 +174,57 @@
   }
 
   function showResetConfirm() {
-    openModal("<h2 id=\"modalTitle\">進捗リセット</h2><p>黒くしたマスと入力した答えを元に戻しますか？</p><div class=\"modalactions\"><button id=\"doReset\" type=\"button\">リセットする</button><button id=\"cancelReset\" type=\"button\">キャンセル</button></div>");
-    E("doReset").addEventListener("click", reset);
+    openModal("<h2 id=\"modalTitle\">進捗リセット</h2><p>すべての問題の進捗と回答を最初の状態に戻しますか？</p><div class=\"modalactions\"><button id=\"doReset\" type=\"button\">すべてリセットする</button><button id=\"cancelReset\" type=\"button\">キャンセル</button></div>");
+    E("doReset").addEventListener("click", resetAllProgress);
     E("cancelReset").addEventListener("click", closeModal);
   }
 
-  function reset() {
+  function resetAllProgress() {
     selected.clear();
     q1Solved = false;
+    q2Solved = false;
     currentQuestion = 0;
+    mazePosition = [0, 4];
+    routeText = "";
     E("answerInput").value = "";
     E("wrongMessage").textContent = "";
+    E("lastAnswerInput").value = "";
+    E("lastWrongMessage").textContent = "";
     localStorage.removeItem(storageKey);
+    localStorage.removeItem(mazeStorageKey);
     renderGrid();
+    renderMazeState();
     showQuestion(0);
     closeModal();
+  }
+
+  async function loadNoticeConfig() {
+    try {
+      const response = await fetch("notice-config.json", { cache: "no-store" });
+      if (response.ok) noticeConfig = await response.json();
+    } catch (_) { /* Use fallback notices. */ }
+  }
+
+  function showNotice(question, index = 0) {
+    const fallbacks = {
+      q1: [{ type: "text", content: "まずは二人で、お互いの画面に流れる絵について話してみよう。" }],
+      q2: [{ type: "text", content: "自分の迷路は相手の画面にあります。相手の案内を聞いて、上下左右のボタンを押そう。" }],
+      last: [{ type: "text", content: "指定された動物が、それぞれ何匹いるか数えてみよう。" }]
+    };
+    const notices = noticeConfig.sideB?.[question] || fallbacks[question] || [];
+    if (!notices.length) return;
+    const safeIndex = Math.max(0, Math.min(index, notices.length - 1));
+    const notice = notices[safeIndex];
+    const body = notice.type === "image"
+      ? `<img class="noticeimg" src="${escapeHTML(notice.content)}" alt="気づいたこと">`
+      : `<p class="noticecontent">${escapeHTML(notice.content)}</p>`;
+    const count = notices.length > 1 ? ` ${safeIndex + 1}/${notices.length}` : "";
+    const controls = notices.length > 1
+      ? `<div class="modalactions"><button id="noticePrev" type="button" ${safeIndex === 0 ? "disabled" : ""}>戻る</button><button id="noticeNext" type="button" ${safeIndex === notices.length - 1 ? "disabled" : ""}>次へ</button></div>`
+      : "";
+    openModal(`<h2 id="modalTitle">気づく${count}</h2>${body}${controls}`);
+    E("noticePrev")?.addEventListener("click", () => showNotice(question, safeIndex - 1));
+    E("noticeNext")?.addEventListener("click", () => showNotice(question, safeIndex + 1));
   }
 
   function save() {
@@ -269,7 +309,7 @@
     q2Solved = true;
     saveMaze();
     updateQuestionNav();
-    openModal('<h2 id="modalTitle">正解！</h2><p>Q2を解き明かした！</p><div class="modalactions"><button id="goLast" type="button">Q3へ</button></div>');
+    openModal('<h2 id="modalTitle">正解！</h2><p>Q2を解き明かした！</p><div class="modalactions"><button id="goLast" type="button">LASTへ</button></div>');
     E("goLast").addEventListener("click", () => { closeModal(); showQuestion(2); });
   }
 
@@ -298,19 +338,30 @@
   }
 
   async function initLast() {
-    try {
-      const response = await fetch("last-config.json", { cache: "no-store" });
-      if (response.ok) lastConfig = await response.json();
-    } catch (_) { /* Use the bundled default. */ }
+    await syncLastClock(true);
     const duration = Math.max(10, Number(lastConfig.roundDurationSeconds) || 300);
     E("roundProgress").max = duration;
     updateLastRound();
     window.setInterval(updateLastRound, 250);
+    window.setInterval(() => syncLastClock(false), 60000);
+  }
+
+  async function syncLastClock(loadConfig) {
+    const started = Date.now();
+    try {
+      const response = await fetch("last-config.json", { cache: "no-store" });
+      const received = Date.now();
+      if (response.ok && loadConfig) lastConfig = await response.json();
+      const serverDate = Date.parse(response.headers.get("Date") || "");
+      if (Number.isFinite(serverDate)) {
+        clockOffsetMs = serverDate + 500 - ((started + received) / 2);
+      }
+    } catch (_) { /* Fall back to the device clock when offline. */ }
   }
 
   function updateLastRound() {
     const duration = Math.max(10, Number(lastConfig.roundDurationSeconds) || 300);
-    const nowSeconds = Date.now() / 1000;
+    const nowSeconds = (Date.now() + clockOffsetMs) / 1000;
     const roundKey = Math.floor(nowSeconds / duration);
     const remaining = duration - (nowSeconds - roundKey * duration);
     E("roundProgress").value = remaining;
@@ -371,7 +422,7 @@
     side.targetAnimalIndexes.forEach((animalIndex, index) => {
       const wrapper = document.createElement("div");
       wrapper.className = "last-target";
-      wrapper.innerHTML = `<span>${index + 1}</span><img src="images/zodiac/${lastModel.animals[animalIndex]}.png" alt="${lastModel.animalNames[animalIndex]}">`;
+      wrapper.innerHTML = `<span>${side.targetPositions?.[index] || index + 1}</span><img src="images/zodiac/${lastModel.animals[animalIndex]}.png" alt="${lastModel.animalNames[animalIndex]}">`;
       E("lastTargets").appendChild(wrapper);
     });
     E("lastAnswerInput").value = "";
@@ -428,7 +479,7 @@
       E("lastWrongMessage").textContent = "どうやら違うようだ。もう一度確かめよう。";
       return;
     }
-    window.trackGameEvent?.("game_clear", "team1");
+    window.trackGameEvent?.("game_clear", "team1_sideB");
     showClear();
   }
 

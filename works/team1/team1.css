@@ -3,6 +3,11 @@
   --team-purple: #73508c;
 }
 
+#titlePage .home-banner {
+  width: 100%;
+  margin-left: 0;
+}
+
 .team-intro h1,
 .team-intro > p,
 .role-guide {
@@ -11,6 +16,16 @@
 
 .team-intro ol {
   width: min(650px, 100%);
+  margin: 0 auto;
+}
+
+.team-meta {
+  justify-content: center;
+  margin: 22px 0 28px;
+}
+
+.team-notices {
+  width: min(700px, 100%);
   margin: 0 auto;
 }
 
@@ -249,6 +264,13 @@
 .team-pager { margin: 18px 0; }
 #questionSteps { display: flex; gap: 9px; }
 
+.question-footer {
+  margin-top: 24px;
+  padding-top: 14px;
+  border-top: 1px solid #d8cfc2;
+  text-align: center;
+}
+
 .coop-maze-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -448,28 +470,30 @@
 .round-timer span { min-width: 82px; font-variant-numeric: tabular-nums; }
 
 .kana-key {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   overflow: hidden;
   border: 3px solid #333;
   background: #fff;
 }
 
-.kana-numbers,
-.kana-letters {
+.kana-pair {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(42px, auto));
+  min-width: 0;
+  border-right: 1px solid #aaa;
 }
 
-.kana-numbers { border-bottom: 2px solid #333; }
+.kana-pair:last-child { border-right: 0; }
 .kana-key span {
   display: grid;
   min-width: 0;
   min-height: 42px;
   place-items: center;
-  border-right: 1px solid #aaa;
   font-size: clamp(12px, 2.8vw, 18px);
   font-weight: 900;
 }
-.kana-key span:last-child { border-right: 0; }
+.kana-pair span:first-child { border-bottom: 2px solid #333; }
 
 .last-targets {
   display: flex;
@@ -518,9 +542,24 @@
 
 @media (max-width: 560px) {
   .zodiac-stage { height: 390px; }
-  .kana-key { overflow-x: auto; }
-  .kana-numbers,
-  .kana-letters { min-width: 540px; }
+  .kana-key {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(6, auto);
+    grid-auto-flow: column;
+  }
+  .kana-pair {
+    grid-template-columns: 52px minmax(0, 1fr);
+    grid-template-rows: 1fr;
+    border-right: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
+  }
+  .kana-pair:nth-child(6),
+  .kana-pair:nth-child(12) { border-bottom: 0; }
+  .kana-pair:nth-child(n + 7) { border-right: 0; }
+  .kana-pair span:first-child {
+    border-right: 2px solid #333;
+    border-bottom: 0;
+  }
   .last-answer-area { flex-direction: column; }
 }
 
