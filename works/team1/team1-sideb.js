@@ -310,8 +310,7 @@
   }
 
   function checkMazeAnswer() {
-    const atGoal = mazePosition[0] === 4 && mazePosition[1] === 0;
-    if (!atGoal || normalize(E("q2AnswerInput").value) !== "かいてん") {
+    if (normalize(E("q2AnswerInput").value) !== "かいてん") {
       E("q2WrongMessage").textContent = "どうやらまちがっているようだ。";
       return;
     }
@@ -327,11 +326,9 @@
   function resetMaze() {
     mazePosition = [0, 4];
     routeText = "";
-    E("q2AnswerInput").value = "";
-    E("q2WrongMessage").textContent = "";
-    q2Solved = false;
     localStorage.removeItem(mazeStorageKey);
     renderMazeState();
+    saveMaze();
   }
 
   function saveMaze() {

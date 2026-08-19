@@ -420,7 +420,7 @@
   height: clamp(320px, 58vw, 460px);
   margin-top: 18px;
   overflow: hidden;
-  border: 4px solid var(--last-dark);
+  border: 4px solid var(--last-accent);
   background: #fff1cf;
 }
 
@@ -464,7 +464,7 @@
   align-items: center;
   margin: 10px 0 22px;
   font-weight: 900;
-  color: var(--last-dark);
+  color: var(--last-accent);
 }
 
 .round-timer progress {
@@ -535,15 +535,6 @@
   font-weight: 900;
 }
 
-#lastAnswerCard .answerrow input {
-  border-color: var(--last-accent);
-}
-
-#lastAnswerCard .answerrow button {
-  background: var(--last-accent);
-  color: #fff;
-}
-
 @media (max-width: 560px) {
   .zodiac-stage { height: 390px; }
   .kana-key {
@@ -569,4 +560,326 @@
 @media (max-width: 650px) {
   .role-select { grid-template-columns: 1fr; }
   .side-header { align-items: flex-start; flex-direction: column; }
+}
+
+/* ===== TEAM1 WORLD DESIGN ===== */
+.team-title-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 12% 15%, #d8f26e 0 3px, transparent 4px),
+    radial-gradient(circle at 88% 18%, #dda9f4 0 4px, transparent 5px),
+    linear-gradient(110deg, #e8f6c8 0 44%, #fff8e9 44% 56%, #f0dbf5 56% 100%);
+  background-size: 46px 46px, 58px 58px, auto;
+  color: #29251f;
+}
+
+.team-title-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 47%, #fff9 50%, transparent 53%);
+}
+
+#titlePage { position: relative; }
+
+#titlePage .home-banner {
+  border-bottom: 3px solid #f4c642;
+  background: linear-gradient(90deg, var(--team-green), #65a72f 48%, var(--team-purple));
+  box-shadow: 0 8px 24px #553d6a3d;
+  letter-spacing: .08em;
+}
+
+#titlePage .hero-card {
+  border: 5px solid #fff;
+  border-radius: 24px;
+  box-shadow: 0 18px 38px #5a3f6a42, 0 0 0 3px #e3bd3d;
+}
+
+#titlePage .hero-card::after {
+  content: "ふたりで挑戦！";
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  padding: 4px 10px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--team-green), var(--team-purple));
+  color: #fff;
+  font: 900 13px/1.4 system-ui, "Yu Gothic", sans-serif;
+  letter-spacing: .08em;
+}
+
+#titlePage .hero-card { position: relative; }
+
+#titlePage .team-intro {
+  position: relative;
+  overflow: hidden;
+  border: 4px solid #fff;
+  border-radius: 24px;
+  background:
+    linear-gradient(90deg, var(--team-green) 0 50%, var(--team-purple) 50%) top/100% 7px no-repeat,
+    linear-gradient(#fffaf2f7, #f4ecdef7);
+  box-shadow: 0 18px 42px #5a3f6a35, 0 0 0 2px #d7c7aa;
+}
+
+#titlePage .team-intro::after {
+  content: "TEAM PLAY / 2 PLAYERS";
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  color: #796c5c;
+  font: 800 10px/1 ui-monospace, Consolas, monospace;
+  letter-spacing: .14em;
+}
+
+.world-kicker {
+  margin: 9px 0 4px;
+  color: var(--team-purple);
+  font: 800 12px/1.4 ui-monospace, Consolas, monospace;
+  letter-spacing: .2em;
+}
+
+.team-intro h1 {
+  max-width: 850px;
+  margin: 8px auto 14px;
+  font-size: clamp(27px, 5vw, 46px);
+  line-height: 1.35;
+  letter-spacing: .04em;
+}
+
+.team-intro h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 34px;
+  font-size: 20px;
+  letter-spacing: .14em;
+}
+
+.team-intro h2::before,
+.team-intro h2::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #b8a98f;
+}
+
+.team-meta span {
+  border: 2px solid #dfbd47;
+  border-radius: 999px;
+  background: #fff4bd;
+  font-weight: 800;
+}
+
+.role-guide {
+  padding-top: 22px;
+  border-top: 1px dashed #b8a98f;
+  letter-spacing: .06em;
+}
+
+.role-card {
+  position: relative;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 12px 28px #241d1640;
+}
+
+.role-card::before {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  padding: 4px 9px;
+  border-radius: 3px;
+  color: #fff;
+  font: 900 11px/1.4 ui-monospace, Consolas, monospace;
+  letter-spacing: .16em;
+}
+
+.role-a::before { content: "SIDE A / NEGI"; background: var(--team-green); }
+.role-b::before { content: "SIDE B / NASU"; background: var(--team-purple); }
+
+.side-page {
+  --side-accent: var(--team-green);
+  --side-accent-rgb: 57, 122, 67;
+  background:
+    radial-gradient(circle at 18px 18px, rgba(var(--side-accent-rgb), .13) 0 4px, transparent 5px),
+    linear-gradient(#ffffff80, #ffffff80),
+    #e7f0e8;
+  background-size: 52px 52px, auto, auto;
+}
+
+.side-b {
+  --side-accent: var(--team-purple);
+  --side-accent-rgb: 115, 80, 140;
+  background-color: #efe8f3;
+}
+
+.team-game { position: relative; }
+
+.side-header {
+  position: relative;
+  margin: 0 0 18px;
+  padding: 12px 16px 12px 20px;
+  overflow: hidden;
+  border: 3px solid #fff;
+  border-radius: 18px;
+  background: rgba(255, 250, 242, .94);
+  box-shadow: 0 10px 24px rgba(var(--side-accent-rgb), .22);
+  color: var(--side-accent);
+}
+
+.side-header::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 7px;
+  background: var(--side-accent);
+}
+
+.side-header span { color: var(--side-accent); font-family: ui-monospace, Consolas, monospace; }
+
+.game-question,
+.team-game > .answer {
+  border: 3px solid #fff;
+  border-top: 8px solid var(--side-accent);
+  border-radius: 22px;
+  background: #fffaf2f7;
+  box-shadow: 0 14px 32px rgba(var(--side-accent-rgb), .20), 0 0 0 1px #cfc4b3;
+}
+
+.question-header {
+  min-height: 54px;
+  margin: -8px -6px 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #cfc4b3;
+}
+
+.question-header::before {
+  content: "PUZZLE START!";
+  position: absolute;
+  left: 0;
+  bottom: -7px;
+  padding-right: 8px;
+  background: #fffaf2;
+  color: #8c7d6a;
+  font: 800 9px/1.4 ui-monospace, Consolas, monospace;
+  letter-spacing: .16em;
+}
+
+.question-header .qlabel {
+  color: var(--side-accent);
+  font-size: clamp(30px, 7vw, 44px);
+  line-height: 1;
+  letter-spacing: .08em;
+}
+
+.last-card .question-header .qlabel { color: var(--side-accent); }
+
+.notice-link {
+  border: 1px solid #a89b88;
+  border-radius: 999px;
+  background: transparent;
+  color: #5f5548;
+  font-weight: 800;
+}
+
+.letter-grid,
+.image-lane,
+.maze-controller,
+.route-text,
+.zodiac-stage,
+.kana-key {
+  box-shadow: 0 8px 20px #35291d1d, inset 0 0 0 1px #ffffff80;
+}
+
+.team-pager {
+  width: fit-content;
+  margin: 22px auto;
+  padding: 8px 12px;
+  border: 3px solid #fff;
+  border-radius: 999px;
+  background: rgba(255, 250, 242, .94);
+  box-shadow: 0 8px 22px rgba(var(--side-accent-rgb), .22);
+}
+
+.team-pager button { min-height: 38px; }
+
+.team-game > .answer h2 {
+  margin-top: 0;
+  color: var(--side-accent);
+  font-size: 20px;
+  letter-spacing: .18em;
+}
+
+#lastAnswerCard h2 { color: var(--side-accent); }
+
+.team-game > .answer .answerrow input {
+  border-width: 2px;
+  border-color: var(--side-accent);
+  background: #fffefb;
+}
+
+.team-game > .answer .answerrow button {
+  background: var(--side-accent);
+  color: #fff;
+}
+
+#lastAnswerCard .answerrow input { border-color: var(--side-accent); }
+#lastAnswerCard .answerrow button { background: var(--side-accent); }
+
+.submitted {
+  border: 1px solid #c7b99e;
+  border-radius: 4px;
+  background: #eee3d0;
+}
+
+.modalbox:has(.clear) {
+  overflow: hidden;
+  border: 5px solid #fff;
+  background:
+    radial-gradient(circle at 12px 12px, #ffd64a 0 3px, transparent 4px) 0 0/38px 38px,
+    linear-gradient(110deg, #e8f6c8 0 47%, #fff8e9 47% 53%, #f0dbf5 53%);
+  box-shadow: 0 0 0 3px #e3bd3d, 0 24px 70px #0009;
+}
+
+.clear h1 {
+  margin: 0;
+  color: #f2ad18;
+  font-size: clamp(48px, 12vw, 82px);
+  line-height: 1;
+  letter-spacing: .08em;
+  -webkit-text-stroke: 2px #4a2c12;
+  paint-order: stroke fill;
+  text-shadow: 0 5px 0 #7d4514, 0 9px 18px #3e281b42;
+}
+
+.clear h2 {
+  margin: 12px 0 18px;
+  color: var(--team-purple);
+  font-size: clamp(26px, 7vw, 40px);
+  text-shadow: 2px 2px 0 #fff;
+}
+
+.clearimg {
+  border: 5px solid #fff;
+  border-radius: 20px;
+  box-shadow: 0 12px 28px #4c35524a, 0 0 0 2px #e3bd3d;
+}
+
+.clear .tweet {
+  background: linear-gradient(90deg, var(--team-green), var(--team-purple));
+  box-shadow: 0 6px 14px #553d6a42;
+}
+
+@media (max-width: 650px) {
+  #titlePage .team-intro::after { display: none; }
+  .world-kicker { font-size: 10px; letter-spacing: .12em; }
+  .team-intro h1 { font-size: 28px; }
+  .side-header { align-items: stretch; }
+  .side-header span { text-align: right; }
+  .game-question,
+  .team-game > .answer { padding: 18px 14px; }
+  .question-header { margin-inline: 0; }
 }
