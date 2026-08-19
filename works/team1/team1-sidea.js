@@ -49,18 +49,18 @@
     startCycle();
     E("answerButton").addEventListener("click", checkAnswer);
     E("answerInput").addEventListener("keydown", event => { if (event.key === "Enter") checkAnswer(); });
-    E("noticeButton").addEventListener("click", () => showNotice("q1"));
+    E("noticeButton").addEventListener("click", () => showNoticeConfirm("q1"));
     document.querySelectorAll(".progress-reset-button").forEach(button => button.addEventListener("click", showResetConfirm));
     E("laneFullscreenButton").addEventListener("click", openLaneFullscreen);
     E("laneFullscreenClose").addEventListener("click", closeLaneFullscreen);
     document.addEventListener("fullscreenchange", updateLaneFullscreen);
-    E("q2NoticeButton").addEventListener("click", () => showNotice("q2"));
+    E("q2NoticeButton").addEventListener("click", () => showNoticeConfirm("q2"));
     document.querySelectorAll("[data-move]").forEach(button => button.addEventListener("click", () => moveMaze(button.dataset.move)));
     E("mazeResetButton").addEventListener("click", resetMaze);
     E("q2AnswerButton").addEventListener("click", checkMazeAnswer);
     E("q2AnswerInput").addEventListener("keydown", event => { if (event.key === "Enter") checkMazeAnswer(); });
     E("q2AnswerInput").addEventListener("input", saveMaze);
-    E("lastNoticeButton").addEventListener("click", () => showNotice("last"));
+    E("lastNoticeButton").addEventListener("click", () => showNoticeConfirm("last"));
     E("lastAnswerButton").addEventListener("click", checkLastAnswer);
     E("lastAnswerInput").addEventListener("keydown", event => { if (event.key === "Enter") checkLastAnswer(); });
     document.querySelectorAll(".zoom-image-button, .route-node").forEach(button => button.addEventListener("click", () => openViewer(button.querySelector(".zoomable-image"))));
@@ -194,6 +194,11 @@
       const response = await fetch("notice-config.json", { cache: "no-store" });
       if (response.ok) noticeConfig = await response.json();
     } catch { /* Use fallback notices. */ }
+  }
+
+  function showNoticeConfirm(question) {
+    openModal('<h2 id="modalTitle">気づく</h2><img class="thinking-image" src="../../image/kanngaeru.png" alt="考えているなぞねぎ"><p class="noticecontent">なぞねぎが周囲をもう一度見回します。\n\n新しい発見があるかもしれません。\n\n「次へ」を押すと、なぞねぎが気づいた内容を確認できます。</p><div class="modalactions"><button id="showNotice" type="button">次へ</button></div>');
+    E("showNotice").addEventListener("click", () => showNotice(question, 0));
   }
 
   function showNotice(question, index = 0) {

@@ -37,9 +37,32 @@
 }
 
 .role-select {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+}
+
+@media (min-width: 651px) {
+  .role-select::after {
+    content: "•••";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 4;
+    display: grid;
+    width: 54px;
+    aspect-ratio: 1;
+    place-items: center;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    background: #d9a847;
+    box-shadow: 0 4px 0 #805e27, 0 8px 18px #38281742;
+    color: #5a421f;
+    font-weight: 900;
+    letter-spacing: 2px;
+    transform: translate(-50%, -50%);
+  }
 }
 
 .role-card {
@@ -648,6 +671,16 @@
   letter-spacing: .04em;
 }
 
+.mission-copy {
+  width: min(760px, 100%);
+  margin: 0 auto 22px;
+  padding: 16px 18px;
+  border: 2px dashed #c2ac85;
+  border-radius: 14px;
+  background: #fffdf7b8;
+  font-weight: 700;
+}
+
 .team-intro h2 {
   display: flex;
   align-items: center;
@@ -663,6 +696,49 @@
   flex: 1;
   height: 1px;
   background: #b8a98f;
+}
+
+.team-intro ol {
+  counter-reset: mission-step;
+  display: grid;
+  gap: 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.team-intro ol li {
+  counter-increment: mission-step;
+  position: relative;
+  min-height: 46px;
+  padding: 9px 14px 9px 58px;
+  border: 1px solid #d6c6a9;
+  border-radius: 12px;
+  background: #fffdf8;
+}
+
+.team-intro ol li::before {
+  content: counter(mission-step);
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  display: grid;
+  width: 32px;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--team-green), var(--team-purple));
+  box-shadow: 0 0 0 1px #bda77d;
+  color: #fff;
+  font-weight: 900;
+  transform: translateY(-50%);
+}
+
+.team-notices {
+  padding: 16px 18px 16px 40px;
+  border: 2px solid #dfbd47;
+  border-radius: 14px;
+  background: #fff6c9;
 }
 
 .team-meta span {
@@ -710,6 +786,21 @@
   background-size: 52px 52px, auto, auto;
 }
 
+.side-page::before,
+.side-page::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  width: 150px;
+  aspect-ratio: 1;
+  border: 22px solid rgba(var(--side-accent-rgb), .10);
+  pointer-events: none;
+  transform: rotate(18deg);
+}
+
+.side-page::before { top: 12%; left: -72px; border-radius: 28px; }
+.side-page::after { right: -78px; bottom: 8%; border-radius: 50%; }
+
 .side-b {
   --side-accent: var(--team-purple);
   --side-accent-rgb: 115, 80, 140;
@@ -745,7 +836,12 @@
   border: 3px solid #fff;
   border-top: 8px solid var(--side-accent);
   border-radius: 22px;
-  background: #fffaf2f7;
+  background:
+    radial-gradient(circle at 14px 14px, #d5c8b5 0 3px, transparent 4px),
+    radial-gradient(circle at calc(100% - 14px) 14px, #d5c8b5 0 3px, transparent 4px),
+    radial-gradient(circle at 14px calc(100% - 14px), #d5c8b5 0 3px, transparent 4px),
+    radial-gradient(circle at calc(100% - 14px) calc(100% - 14px), #d5c8b5 0 3px, transparent 4px),
+    #fffaf2f7;
   box-shadow: 0 14px 32px rgba(var(--side-accent-rgb), .20), 0 0 0 1px #cfc4b3;
 }
 
@@ -785,6 +881,17 @@
   font-weight: 800;
 }
 
+.thinking-image {
+  display: block;
+  width: min(260px, 72vw);
+  height: auto;
+  margin: 18px auto;
+  border: 5px solid #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(var(--side-accent-rgb), .35), 0 0 0 3px #f2c94c;
+  object-fit: contain;
+}
+
 .letter-grid,
 .image-lane,
 .maze-controller,
@@ -805,6 +912,17 @@
 }
 
 .team-pager button { min-height: 38px; }
+
+#questionSteps .dot {
+  border-color: var(--side-accent);
+  background: #fff;
+  box-shadow: inset 0 -3px 0 #0002;
+}
+
+#questionSteps .dot.current {
+  background: var(--side-accent);
+  box-shadow: 0 0 0 3px #fff, 0 0 14px rgba(var(--side-accent-rgb), .75);
+}
 
 .team-game > .answer h2 {
   margin-top: 0;
@@ -882,4 +1000,22 @@
   .game-question,
   .team-game > .answer { padding: 18px 14px; }
   .question-header { margin-inline: 0; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .game-question:not(.hidden),
+  .team-game > .answer:not(.hidden) {
+    animation: panel-enter .28s ease-out both;
+  }
+
+  #questionSteps .dot.current { animation: lamp-pulse 1.8s ease-in-out infinite; }
+}
+
+@keyframes panel-enter {
+  from { opacity: 0; transform: translateY(8px) scale(.995); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes lamp-pulse {
+  50% { box-shadow: 0 0 0 3px #fff, 0 0 22px rgba(var(--side-accent-rgb), .95); }
 }
