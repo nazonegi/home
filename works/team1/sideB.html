@@ -41,7 +41,7 @@
         <button id="laneFullscreenClose" class="lane-fullscreen-close" type="button" aria-label="拡大表示を閉じる">×</button>
       </div>
       <button id="laneFullscreenButton" class="lane-fullscreen-button" type="button">拡大</button>
-      <footer class="question-footer"><button class="progress-reset-button resetlink" type="button">進捗リセット</button></footer>
+      <p id="q1SubmittedAnswer" class="submitted hidden"></p>
     </section>
 
     <section id="question2" class="card q2-card game-question hidden">
@@ -78,10 +78,9 @@
       <div id="routeText" class="route-text" aria-live="polite" aria-label="経路で得たひらがな"></div>
       <div class="q2-actions">
         <button id="mazeResetButton" type="button">リセット</button>
-        <button id="mazeAnswerButton" type="button">決定</button>
       </div>
       <p id="mazeMessage" class="ng" aria-live="polite"></p>
-      <footer class="question-footer"><button class="progress-reset-button resetlink" type="button">進捗リセット</button></footer>
+      <p id="q2SubmittedAnswer" class="submitted hidden"></p>
     </section>
 
     <section id="questionLast" class="card last-card game-question hidden">
@@ -112,12 +111,7 @@
       </div>
 
       <div id="lastTargets" class="last-targets" aria-label="数える動物"></div>
-      <div class="last-answer-area">
-        <input id="lastAnswerInput" autocomplete="off" placeholder="答えを入力" aria-label="LASTの答え">
-        <button id="lastAnswerButton" type="button">決定</button>
-      </div>
-      <p id="lastWrongMessage" class="ng" aria-live="polite"></p>
-      <footer class="question-footer"><button class="progress-reset-button resetlink" type="button">進捗リセット</button></footer>
+      <p id="lastSubmittedAnswer" class="submitted hidden"></p>
     </section>
 
     <nav class="pager team-pager" aria-label="問題の切り替え">
@@ -137,6 +131,27 @@
         <button id="answerButton" type="button">決定</button>
       </div>
       <p id="wrongMessage" class="ng" aria-live="polite"></p>
+      <div class="resetarea"><button class="progress-reset-button resetlink" type="button">進捗リセット</button></div>
+    </section>
+
+    <section id="q2AnswerCard" class="card answer hidden">
+      <h2>こたえ</h2>
+      <div class="answerrow">
+        <input id="q2AnswerInput" autocomplete="off" placeholder="答えを入力" aria-label="Q2の答え">
+        <button id="q2AnswerButton" type="button">決定</button>
+      </div>
+      <p id="q2WrongMessage" class="ng" aria-live="polite"></p>
+      <div class="resetarea"><button class="progress-reset-button resetlink" type="button">進捗リセット</button></div>
+    </section>
+
+    <section id="lastAnswerCard" class="card answer hidden">
+      <h2>こたえ</h2>
+      <div class="answerrow">
+        <input id="lastAnswerInput" autocomplete="off" placeholder="答えを入力" aria-label="LASTの答え">
+        <button id="lastAnswerButton" type="button">決定</button>
+      </div>
+      <p id="lastWrongMessage" class="ng" aria-live="polite"></p>
+      <div class="resetarea"><button class="progress-reset-button resetlink" type="button">進捗リセット</button></div>
     </section>
   </main>
 
