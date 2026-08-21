@@ -4,8 +4,8 @@
   const LETTERS = ["の", "と", "い", "ろ", "に", "も", "ど", "お", "く", "た", "よ", "ん", "ふ", "め", "ま"];
   const RUNNERS = [
     { id: "A", file: "a-kokeshi.png", duration: 5 },
-    { id: "B", file: "b-knight.png", duration: 1 },
-    { id: "C", file: "c-trio.png", duration: 0.5 },
+    { id: "B", file: "b-nine.png", duration: 1 },
+    { id: "C", file: "c-trio.png", duration: 1 },
     { id: "D", file: "d-mamushi.png", duration: 0.3 }
   ];
   const CYCLE_SECONDS = 5;

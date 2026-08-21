@@ -4,7 +4,7 @@
   const LETTERS = ["た", "も", "お", "じ", "と", "ど", "ち", "ゅ", "う", "こ", "ふ", "し", "ま", "て", "ん"];
   const RUNNERS = [
     { id: "A", file: "a-tanuki.png", duration: 5 },
-    { id: "B", file: "b-nine.png", duration: 1 },
+    { id: "B", file: "b-knight.png", duration: 0.5 },
     { id: "C", file: "c-dress.png", duration: 0.5 },
     { id: "D", file: "d-knife.png", duration: 0.3 }
   ];
