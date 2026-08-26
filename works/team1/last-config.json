@@ -1,5 +1,9 @@
 {
   "version": "1.0",
   "roundDurationSeconds": 60,
-  "blackCurtainEnabled": true
+  "blackCurtainEnabled": true,
+  "sizePulseStartSeconds": 20,
+  "speedUpStartSeconds": 40,
+  "speedMultiplier": 2.0
+
 }

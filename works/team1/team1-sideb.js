@@ -414,7 +414,11 @@
         x: random(), y: random(),
         vx: Math.cos(angle) * balancedSpeeds[index],
         vy: Math.sin(angle) * balancedSpeeds[index],
-        size: balancedSizes[index]
+        size: balancedSizes[index],
+        sizePhase: random() * Math.PI * 2,
+        sizePeriod: 0.8 + random() * 1.8,
+        sizeMin: 0.72 + random() * 0.16,
+        sizeMax: 1.12 + random() * 0.28
       };
       image.style.width = `${sprite.size}px`;
       image.style.zIndex = String(1 + Math.floor(random() * 20));
@@ -459,16 +463,29 @@
     const stage = E("zodiacStage");
     const width = stage?.clientWidth || 1;
     const height = stage?.clientHeight || 1;
+    const duration = Math.max(10, Number(lastConfig.roundDurationSeconds) || 300);
+    const roundElapsed = lastRoundKey === null
+      ? 0
+      : (Date.now() + clockOffsetMs) / 1000 - lastRoundKey * duration;
+    const pulseElapsed = Math.max(0, roundElapsed - (Number(lastConfig.sizePulseStartSeconds) || 20));
+    const pulseBlend = Math.min(1, pulseElapsed);
+    const speedUpStart = Number(lastConfig.speedUpStartSeconds) || 40;
+    const speedMultiplier = roundElapsed >= speedUpStart
+      ? Math.max(1, Number(lastConfig.speedMultiplier) || 1.5)
+      : 1;
     lastSprites.forEach(sprite => {
-      sprite.x += sprite.vx * delta;
-      sprite.y += sprite.vy * delta;
+      sprite.x += sprite.vx * delta * speedMultiplier;
+      sprite.y += sprite.vy * delta * speedMultiplier;
       if (sprite.x < 0) { sprite.x = 0; sprite.vx = Math.abs(sprite.vx); }
       if (sprite.x > 1) { sprite.x = 1; sprite.vx = -Math.abs(sprite.vx); }
       if (sprite.y < 0) { sprite.y = 0; sprite.vy = Math.abs(sprite.vy); }
       if (sprite.y > 1) { sprite.y = 1; sprite.vy = -Math.abs(sprite.vy); }
       const drawX = Math.round(sprite.x * Math.max(0, width - sprite.size));
       const drawY = Math.round(sprite.y * Math.max(0, height - sprite.size));
-      sprite.element.style.transform = `translate3d(${drawX}px, ${drawY}px, 0)`;
+      const wave = 0.5 + 0.5 * Math.sin(sprite.sizePhase + pulseElapsed * Math.PI * 2 / sprite.sizePeriod);
+      const targetScale = sprite.sizeMin + (sprite.sizeMax - sprite.sizeMin) * wave;
+      const scale = pulseElapsed > 0 ? 1 + (targetScale - 1) * pulseBlend : 1;
+      sprite.element.style.transform = `translate3d(${drawX}px, ${drawY}px, 0) scale(${scale.toFixed(3)})`;
     });
     requestAnimationFrame(animateZodiac);
   }
