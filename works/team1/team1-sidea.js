@@ -18,6 +18,8 @@
   let selected = new Set();
   let q1Solved = false;
   let q2Solved = false;
+  let q3Solved = false;
+  let q3Answer = "";
   let currentQuestion = 0;
   let mazePosition = [0, 0];
   let routeText = "";
@@ -32,6 +34,12 @@
   let lastFrameTime = performance.now();
   let curtainReveal = 0;
   let lastCurtainClick = 0;
+
+  const FINAL_ANSWERS = {
+    "い": "かいと", "う": "とうか", "く": "とくい", "し": "としん",
+    "す": "てすと", "せ": "せいと", "そ": "ひそか", "た": "とたん",
+    "と": "かっと", "ふ": "ふとん", "ろ": "ひろい", "ん": "てんと"
+  };
 
   const MAZE_LETTERS = { "0,3": "み", "1,0": "ん", "2,1": "う", "2,4": "し", "3,3": "い", "4,3": "よ" };
   const BLOCKED = new Set([
@@ -54,6 +62,9 @@
     E("laneFullscreenButton").addEventListener("click", openLaneFullscreen);
     E("laneFullscreenClose").addEventListener("click", closeLaneFullscreen);
     document.addEventListener("fullscreenchange", updateLaneFullscreen);
+    E("spotFullscreenButton").addEventListener("click", openSpotFullscreen);
+    E("spotFullscreenClose").addEventListener("click", closeSpotFullscreen);
+    document.addEventListener("fullscreenchange", updateSpotFullscreen);
     E("q2NoticeButton").addEventListener("click", () => showNoticeConfirm("q2"));
     document.querySelectorAll("[data-move]").forEach(button => button.addEventListener("click", () => moveMaze(button.dataset.move)));
     E("mazeResetButton").addEventListener("click", resetMaze);
@@ -63,6 +74,8 @@
     E("lastNoticeButton").addEventListener("click", () => showNoticeConfirm("last"));
     E("lastAnswerButton").addEventListener("click", checkLastAnswer);
     E("lastAnswerInput").addEventListener("keydown", event => { if (event.key === "Enter") checkLastAnswer(); });
+    E("finalAnswerButton").addEventListener("click", checkFinalAnswer);
+    E("finalAnswerInput").addEventListener("keydown", event => { if (event.key === "Enter") checkFinalAnswer(); });
     document.querySelectorAll(".zoom-image-button, .route-node").forEach(button => button.addEventListener("click", () => openViewer(button.querySelector(".zoomable-image"))));
     E("viewerClose").addEventListener("click", closeViewer);
     E("viewer").addEventListener("click", event => { if (event.target === E("viewer")) closeViewer(); });
@@ -167,6 +180,31 @@
     lane.classList.toggle("is-mobile-expanded", document.fullscreenElement === lane);
   }
 
+  async function openSpotFullscreen() {
+    const view = E("spotDifferenceView");
+    try {
+      if (view.requestFullscreen) await view.requestFullscreen();
+      view.classList.add("is-expanded");
+      if (screen.orientation && screen.orientation.lock) {
+        try { await screen.orientation.lock("landscape"); } catch (_) { /* 拡大表示だけ継続する */ }
+      }
+    } catch (_) {
+      view.classList.add("is-expanded");
+    }
+  }
+
+  async function closeSpotFullscreen() {
+    if (document.fullscreenElement === E("spotDifferenceView") && document.exitFullscreen) {
+      try { await document.exitFullscreen(); } catch (_) { /* class removal is the fallback */ }
+    }
+    E("spotDifferenceView").classList.remove("is-expanded");
+  }
+
+  function updateSpotFullscreen() {
+    const view = E("spotDifferenceView");
+    view.classList.toggle("is-expanded", document.fullscreenElement === view);
+  }
+
   function checkAnswer() {
     const answer = normalize(E("answerInput").value);
     if (!["hit", "ひっと"].includes(answer)) {
@@ -242,6 +280,8 @@
     selected.clear();
     q1Solved = false;
     q2Solved = false;
+    q3Solved = false;
+    q3Answer = "";
     currentQuestion = 0;
     mazePosition = [0, 0];
     routeText = "";
@@ -251,7 +291,9 @@
     E("q2WrongMessage").textContent = "";
     E("lastAnswerInput").value = "";
     E("lastWrongMessage").textContent = "";
-    ["q1SubmittedAnswer", "q2SubmittedAnswer", "lastSubmittedAnswer"].forEach(id => setSubmittedAnswer(id, ""));
+    E("finalAnswerInput").value = "";
+    E("finalWrongMessage").textContent = "";
+    ["q1SubmittedAnswer", "q2SubmittedAnswer", "lastSubmittedAnswer", "finalSubmittedAnswer"].forEach(id => setSubmittedAnswer(id, ""));
     localStorage.removeItem(storageKey);
     localStorage.removeItem(mazeStorageKey);
     renderGrid();
@@ -284,7 +326,7 @@
   function closeModal() { E("modal").classList.add("hidden"); }
 
   function showQuestion(index) {
-    if (index < 0 || index > 2 || (index === 1 && !q1Solved) || (index === 2 && !q2Solved)) return;
+    if (index < 0 || index > 3 || (index === 1 && !q1Solved) || (index === 2 && !q2Solved) || (index === 3 && !q3Solved)) return;
     currentQuestion = index;
     E("question1").classList.toggle("hidden", index !== 0);
     E("q1AnswerCard").classList.toggle("hidden", index !== 0);
@@ -292,6 +334,8 @@
     E("q2AnswerCard").classList.toggle("hidden", index !== 1);
     E("questionLast").classList.toggle("hidden", index !== 2);
     E("lastAnswerCard").classList.toggle("hidden", index !== 2);
+    E("questionFinal").classList.toggle("hidden", index !== 3);
+    E("finalAnswerCard").classList.toggle("hidden", index !== 3);
     updateQuestionNav();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -300,9 +344,10 @@
     const steps = [...document.querySelectorAll("[data-question]")];
     steps[1].disabled = !q1Solved;
     steps[2].disabled = !q2Solved;
+    steps[3].disabled = !q3Solved;
     steps.forEach((button, index) => button.classList.toggle("current", index === currentQuestion));
     E("prevQuestionButton").disabled = currentQuestion === 0;
-    E("nextQuestionButton").disabled = currentQuestion === 2 || (currentQuestion === 0 && !q1Solved) || (currentQuestion === 1 && !q2Solved);
+    E("nextQuestionButton").disabled = currentQuestion === 3 || (currentQuestion === 0 && !q1Solved) || (currentQuestion === 1 && !q2Solved) || (currentQuestion === 2 && !q3Solved);
   }
 
   function edgeKey(from, to) {
@@ -337,7 +382,7 @@
     q2Solved = true;
     saveMaze();
     updateQuestionNav();
-    openModal('<h2 id="modalTitle">正解！</h2><p>Q2を解き明かした！</p><div class="modalactions"><button id="goLast" type="button">LASTへ</button></div>');
+    openModal('<h2 id="modalTitle">正解！</h2><p>Q2を解き明かした！</p><div class="modalactions"><button id="goLast" type="button">Q3へ</button></div>');
     E("goLast").addEventListener("click", () => { closeModal(); showQuestion(2); });
   }
 
@@ -533,7 +578,24 @@
         : "どうやら違うようだ。";
       return;
     }
+    E("lastWrongMessage").textContent = "";
     setSubmittedAnswer("lastSubmittedAnswer", E("lastAnswerInput").value);
+    q3Solved = true;
+    q3Answer = side.answer;
+    updateQuestionNav();
+    openModal('<h2 id="modalTitle">正解！</h2><p>Q3を解き明かした！</p><div class="modalactions"><button id="goFinal" type="button">LASTへ</button></div>');
+    E("goFinal").addEventListener("click", () => { closeModal(); showQuestion(3); });
+  }
+
+  function checkFinalAnswer() {
+    const sourceCharacter = [...q3Answer][2];
+    const correctAnswer = FINAL_ANSWERS[sourceCharacter];
+    if (!correctAnswer || normalize(E("finalAnswerInput").value) !== correctAnswer) {
+      E("finalWrongMessage").textContent = "どうやら違うようだ。";
+      return;
+    }
+    E("finalWrongMessage").textContent = "";
+    setSubmittedAnswer("finalSubmittedAnswer", E("finalAnswerInput").value);
     window.trackGameEvent?.("game_clear", "team1_sideA");
     showClear();
   }
@@ -563,6 +625,6 @@
     const postText = ending.postText || "『協力しないと出られない部屋からの脱出』をクリアしました！";
     const shareUrl = new URL(".", location.href).href;
     const postUrl = `https://x.com/intent/post?text=${encodeURIComponent(`${postText}\n${shareUrl}`)}`;
-    openModal(`<div class="clear"><h1>CLEAR</h1><h2>脱出成功！</h2><p class="submitted">あなたの答え：${escapeHTML(E("lastAnswerInput").value)}</p><img class="clearimg" src="${escapeHTML(image)}" alt="なぞねぎのクリア画像"><p>${escapeHTML(message)}</p><a class="tweet" href="${postUrl}" target="_blank" rel="noopener noreferrer">クリアポスト</a><p class="thanks">THANK YOU FOR PLAYING</p><div class="clear-home-link"><a href="../../">なぞねぎ脱出へ</a></div></div>`);
+    openModal(`<div class="clear"><h1>CLEAR</h1><h2>脱出成功！</h2><p class="submitted">あなたの答え：${escapeHTML(E("finalAnswerInput").value)}</p><img class="clearimg" src="${escapeHTML(image)}" alt="なぞねぎのクリア画像"><p>${escapeHTML(message)}</p><a class="tweet" href="${postUrl}" target="_blank" rel="noopener noreferrer">クリアポスト</a><p class="thanks">THANK YOU FOR PLAYING</p><div class="clear-home-link"><a href="../../">なぞねぎ脱出へ</a></div></div>`);
   }
 })();

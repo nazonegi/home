@@ -84,7 +84,7 @@
 
     <section id="questionLast" class="card last-card game-question hidden">
       <div class="question-header">
-        <h1 class="qlabel">LAST</h1>
+        <h1 class="qlabel">Q3</h1>
         <button id="lastNoticeButton" class="notice-link" type="button">気づく</button>
       </div>
 
@@ -113,12 +113,25 @@
       <p id="lastSubmittedAnswer" class="submitted hidden"></p>
     </section>
 
+    <section id="questionFinal" class="card final-puzzle-card game-question hidden">
+      <div class="question-header">
+        <h1 class="qlabel">LAST</h1>
+      </div>
+      <p class="spot-difference-label">うえから</p>
+      <div id="spotDifferenceView" class="spot-difference-view">
+        <div id="spotDifferenceRows" class="spot-difference-rows" aria-label="間違い探しの画像"></div>
+        <button id="spotFullscreenClose" class="spot-fullscreen-close" type="button" aria-label="拡大表示を閉じる">×</button>
+      </div>
+      <button id="spotFullscreenButton" class="spot-fullscreen-button" type="button">拡大</button>
+    </section>
+
     <nav class="pager team-pager" aria-label="問題の切り替え">
       <button id="prevQuestionButton" type="button" aria-label="前の問題">◀</button>
       <div id="questionSteps">
         <button class="dot current" type="button" data-question="0" aria-label="Q1"></button>
         <button class="dot" type="button" data-question="1" aria-label="Q2" disabled></button>
-        <button class="dot" type="button" data-question="2" aria-label="LAST" disabled></button>
+        <button class="dot" type="button" data-question="2" aria-label="Q3" disabled></button>
+        <button class="dot" type="button" data-question="3" aria-label="LAST" disabled></button>
       </div>
       <button id="nextQuestionButton" type="button" aria-label="次の問題" disabled>▶</button>
     </nav>
@@ -146,10 +159,21 @@
     <section id="lastAnswerCard" class="card answer hidden">
       <h2>こたえ</h2>
       <div class="answerrow">
-        <input id="lastAnswerInput" autocomplete="off" placeholder="答えを入力" aria-label="LASTの答え">
+        <input id="lastAnswerInput" autocomplete="off" placeholder="答えを入力" aria-label="Q3の答え">
         <button id="lastAnswerButton" type="button">決定</button>
       </div>
       <p id="lastWrongMessage" class="ng" aria-live="polite"></p>
+      <div class="resetarea"><button class="progress-reset-button resetlink" type="button">進捗リセット</button></div>
+    </section>
+
+    <section id="finalAnswerCard" class="card answer hidden">
+      <h2>こたえ</h2>
+      <div class="answerrow">
+        <input id="finalAnswerInput" autocomplete="off" placeholder="答えを入力" aria-label="LASTの答え">
+        <button id="finalAnswerButton" type="button">決定</button>
+      </div>
+      <p id="finalWrongMessage" class="ng" aria-live="polite"></p>
+      <p id="finalSubmittedAnswer" class="submitted hidden"></p>
       <div class="resetarea"><button class="progress-reset-button resetlink" type="button">進捗リセット</button></div>
     </section>
   </main>

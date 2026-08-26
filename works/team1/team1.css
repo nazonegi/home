@@ -457,6 +457,157 @@
   will-change: transform;
 }
 
+.final-puzzle-card {
+  overflow: hidden;
+}
+
+.spot-difference-label {
+  margin: 4px 0 18px;
+  font-size: clamp(2rem, 7vw, 3.5rem);
+  font-weight: 900;
+  letter-spacing: .2em;
+  text-align: center;
+}
+
+.spot-difference-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: min(100%, 680px);
+  margin: 0 auto;
+}
+
+.spot-difference-view {
+  position: relative;
+}
+
+.spot-fullscreen-button {
+  display: block;
+  margin: 14px auto 0;
+  padding: 10px 24px;
+  border: 2px solid #111;
+  border-radius: 999px;
+  background: #fff;
+  color: #111;
+  font-weight: 800;
+}
+
+.spot-fullscreen-close {
+  display: none;
+}
+
+.spot-difference-view.is-expanded,
+.spot-difference-view:fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  padding: max(48px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  place-items: center;
+  box-sizing: border-box;
+  background: #111;
+}
+
+.spot-difference-view.is-expanded .spot-difference-grid,
+.spot-difference-view:fullscreen .spot-difference-grid {
+  width: min(calc(100vw - 24px), calc((100vh - 60px) * 4 / 3));
+  max-width: none;
+}
+
+.spot-difference-view.is-expanded .spot-fullscreen-close,
+.spot-difference-view:fullscreen .spot-fullscreen-close {
+  position: absolute;
+  top: max(8px, env(safe-area-inset-top));
+  right: max(8px, env(safe-area-inset-right));
+  z-index: 2;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  min-height: 0;
+  padding: 0;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  place-items: center;
+  background: #111;
+  color: #fff;
+  font-size: 25px;
+  line-height: 1;
+}
+
+.spot-tile {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+}
+
+.spot-tile::after {
+  position: absolute;
+  inset: 0;
+  border: 1px solid #000;
+  content: "";
+  pointer-events: none;
+}
+
+.spot-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.spot-difference-rows {
+  display: grid;
+  width: min(100%, 820px);
+  margin: 0 auto;
+}
+
+.spot-code-row {
+  display: grid;
+  grid-template-columns: clamp(54px, 14vw, 96px) minmax(0, 1fr);
+  align-items: center;
+}
+
+.spot-source-circle {
+  display: block;
+  width: auto;
+  height: auto;
+  margin: auto;
+}
+
+.spot-source-circle.source-q1 {
+  width: clamp(30px, 5vw, 36px);
+}
+
+.spot-source-circle.source-q2 {
+  width: clamp(38px, 6vw, 44px);
+}
+
+.spot-source-circle.source-q3 {
+  width: clamp(46px, 7vw, 52px);
+}
+
+.spot-code-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.spot-difference-view.is-expanded .spot-difference-rows,
+.spot-difference-view:fullscreen .spot-difference-rows {
+  width: min(calc(100vw - 24px), calc((100vh - 60px) * 4 / 3));
+  max-width: none;
+}
+
+.spot-difference-view.is-expanded .spot-code-row,
+.spot-difference-view:fullscreen .spot-code-row {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.spot-difference-view.is-expanded .spot-source-circle,
+.spot-difference-view:fullscreen .spot-source-circle {
+  display: none;
+}
+
 .zodiac-curtain {
   position: absolute;
   inset: 0;
@@ -869,6 +1020,24 @@
   font-size: clamp(30px, 7vw, 44px);
   line-height: 1;
   letter-spacing: .08em;
+}
+
+.question-number-image {
+  display: block;
+  width: auto;
+  object-fit: contain;
+}
+
+.side-a #question1 .question-number-image {
+  height: clamp(30px, 5vw, 36px);
+}
+
+.side-a #question2 .question-number-image {
+  height: clamp(38px, 6vw, 44px);
+}
+
+.side-a #questionLast .question-number-image {
+  height: clamp(46px, 7vw, 52px);
 }
 
 .last-card .question-header .qlabel { color: var(--side-accent); }

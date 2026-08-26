@@ -17,6 +17,9 @@
   let selected = new Set();
   let q1Solved = false;
   let q2Solved = false;
+  let q3Solved = false;
+  let q3Answer = "";
+  let finalRule = null;
   let currentQuestion = 0;
   let mazePosition = [0, 4];
   let routeText = "";
@@ -30,6 +33,21 @@
   let lastFrameTime = performance.now();
   let curtainReveal = 0;
   let lastCurtainClick = 0;
+
+  const FINAL_RULES = {
+    "い": { answer: "かいと", sources: [2, 3, 1], positions: [1, 3, 3] },
+    "う": { answer: "とうか", sources: [1, 3, 2], positions: [3, 3, 1] },
+    "く": { answer: "とくい", sources: [1, 3, 2], positions: [3, 3, 2] },
+    "し": { answer: "としん", sources: [1, 3, 2], positions: [3, 3, 4] },
+    "す": { answer: "てすと", sources: [2, 3, 1], positions: [3, 3, 3] },
+    "せ": { answer: "せいと", sources: [3, 2, 1], positions: [3, 2, 3] },
+    "そ": { answer: "ひそか", sources: [1, 3, 2], positions: [1, 3, 1] },
+    "た": { answer: "とたん", sources: [1, 3, 2], positions: [3, 3, 4] },
+    "と": { answer: "かっと", sources: [2, 1, 3], positions: [1, 2, 3] },
+    "ふ": { answer: "ふとん", sources: [3, 1, 2], positions: [3, 3, 4] },
+    "ろ": { answer: "ひろい", sources: [1, 3, 2], positions: [1, 3, 2] },
+    "ん": { answer: "てんと", sources: [2, 3, 1], positions: [3, 3, 3] }
+  };
 
   const MAZE_LETTERS = { "0,1": "み", "1,0": "ぎ", "1,2": "て", "2,4": "か", "3,3": "か", "4,1": "ら" };
   const BLOCKED = new Set([
@@ -62,6 +80,11 @@
     E("lastNoticeButton").addEventListener("click", () => showNoticeConfirm("last"));
     E("lastAnswerButton").addEventListener("click", checkLastAnswer);
     E("lastAnswerInput").addEventListener("keydown", event => { if (event.key === "Enter") checkLastAnswer(); });
+    E("finalAnswerButton").addEventListener("click", checkFinalAnswer);
+    E("finalAnswerInput").addEventListener("keydown", event => { if (event.key === "Enter") checkFinalAnswer(); });
+    E("spotFullscreenButton").addEventListener("click", openSpotFullscreen);
+    E("spotFullscreenClose").addEventListener("click", closeSpotFullscreen);
+    document.addEventListener("fullscreenchange", updateSpotFullscreen);
     document.querySelectorAll(".zoom-image-button, .route-node").forEach(button => button.addEventListener("click", () => openViewer(button.querySelector(".zoomable-image"))));
     E("viewerClose").addEventListener("click", closeViewer);
     E("viewer").addEventListener("click", event => { if (event.target === E("viewer")) closeViewer(); });
@@ -155,6 +178,31 @@
     lane.classList.toggle("is-mobile-expanded", document.fullscreenElement === lane);
   }
 
+  async function openSpotFullscreen() {
+    const view = E("spotDifferenceView");
+    try {
+      if (view.requestFullscreen) await view.requestFullscreen();
+      view.classList.add("is-expanded");
+      if (screen.orientation && screen.orientation.lock) {
+        try { await screen.orientation.lock("landscape"); } catch (_) { /* 拡大表示だけ継続する */ }
+      }
+    } catch (_) {
+      view.classList.add("is-expanded");
+    }
+  }
+
+  async function closeSpotFullscreen() {
+    if (document.fullscreenElement === E("spotDifferenceView") && document.exitFullscreen) {
+      try { await document.exitFullscreen(); } catch (_) { /* class removal is the fallback */ }
+    }
+    E("spotDifferenceView").classList.remove("is-expanded");
+  }
+
+  function updateSpotFullscreen() {
+    const view = E("spotDifferenceView");
+    view.classList.toggle("is-expanded", document.fullscreenElement === view);
+  }
+
   function normalize(value) {
     return String(value || "").trim().toLowerCase()
       .replace(/[！-～]/g, char => String.fromCharCode(char.charCodeAt(0) - 0xFEE0))
@@ -186,6 +234,9 @@
     selected.clear();
     q1Solved = false;
     q2Solved = false;
+    q3Solved = false;
+    q3Answer = "";
+    finalRule = null;
     currentQuestion = 0;
     mazePosition = [0, 4];
     routeText = "";
@@ -195,7 +246,10 @@
     E("q2WrongMessage").textContent = "";
     E("lastAnswerInput").value = "";
     E("lastWrongMessage").textContent = "";
-    ["q1SubmittedAnswer", "q2SubmittedAnswer", "lastSubmittedAnswer"].forEach(id => setSubmittedAnswer(id, ""));
+    E("finalAnswerInput").value = "";
+    E("finalWrongMessage").textContent = "";
+    E("spotDifferenceRows").innerHTML = "";
+    ["q1SubmittedAnswer", "q2SubmittedAnswer", "lastSubmittedAnswer", "finalSubmittedAnswer"].forEach(id => setSubmittedAnswer(id, ""));
     localStorage.removeItem(storageKey);
     localStorage.removeItem(mazeStorageKey);
     renderGrid();
@@ -271,7 +325,7 @@
   function closeViewer() { E("viewer").classList.add("hidden"); }
 
   function showQuestion(index) {
-    if (index < 0 || index > 2 || (index === 1 && !q1Solved) || (index === 2 && !q2Solved)) return;
+    if (index < 0 || index > 3 || (index === 1 && !q1Solved) || (index === 2 && !q2Solved) || (index === 3 && !q3Solved)) return;
     currentQuestion = index;
     E("question1").classList.toggle("hidden", index !== 0);
     E("q1AnswerCard").classList.toggle("hidden", index !== 0);
@@ -279,6 +333,8 @@
     E("q2AnswerCard").classList.toggle("hidden", index !== 1);
     E("questionLast").classList.toggle("hidden", index !== 2);
     E("lastAnswerCard").classList.toggle("hidden", index !== 2);
+    E("questionFinal").classList.toggle("hidden", index !== 3);
+    E("finalAnswerCard").classList.toggle("hidden", index !== 3);
     updateQuestionNav();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -287,9 +343,10 @@
     const steps = [...document.querySelectorAll("[data-question]")];
     steps[1].disabled = !q1Solved;
     steps[2].disabled = !q2Solved;
+    steps[3].disabled = !q3Solved;
     steps.forEach((button, index) => button.classList.toggle("current", index === currentQuestion));
     E("prevQuestionButton").disabled = currentQuestion === 0;
-    E("nextQuestionButton").disabled = currentQuestion === 2 || (currentQuestion === 0 && !q1Solved) || (currentQuestion === 1 && !q2Solved);
+    E("nextQuestionButton").disabled = currentQuestion === 3 || (currentQuestion === 0 && !q1Solved) || (currentQuestion === 1 && !q2Solved) || (currentQuestion === 2 && !q3Solved);
   }
 
   function edgeKey(from, to) {
@@ -324,7 +381,7 @@
     q2Solved = true;
     saveMaze();
     updateQuestionNav();
-    openModal('<h2 id="modalTitle">正解！</h2><p>Q2を解き明かした！</p><div class="modalactions"><button id="goLast" type="button">LASTへ</button></div>');
+    openModal('<h2 id="modalTitle">正解！</h2><p>Q2を解き明かした！</p><div class="modalactions"><button id="goLast" type="button">Q3へ</button></div>');
     E("goLast").addEventListener("click", () => { closeModal(); showQuestion(2); });
   }
 
@@ -520,7 +577,57 @@
         : "どうやら違うようだ。もう一度確かめよう。";
       return;
     }
+    E("lastWrongMessage").textContent = "";
     setSubmittedAnswer("lastSubmittedAnswer", E("lastAnswerInput").value);
+    q3Solved = true;
+    q3Answer = side.answer;
+    finalRule = FINAL_RULES[[...q3Answer][2]] || null;
+    renderSpotDifference();
+    updateQuestionNav();
+    openModal('<h2 id="modalTitle">正解！</h2><p>Q3を解き明かした！</p><div class="modalactions"><button id="goFinal" type="button">LASTへ</button></div>');
+    E("goFinal").addEventListener("click", () => { closeModal(); showQuestion(3); });
+  }
+
+  function renderSpotDifference() {
+    const container = E("spotDifferenceRows");
+    container.innerHTML = "";
+    if (!finalRule) return;
+    ["A", "B", "C"].forEach((rowName, rowIndex) => {
+      const row = document.createElement("div");
+      row.className = "spot-code-row";
+      const circle = document.createElement("img");
+      const sourceQuestion = finalRule.sources[rowIndex];
+      circle.className = `spot-source-circle source-q${sourceQuestion}`;
+      circle.src = `images/last/q${sourceQuestion}-circle.png`;
+      circle.alt = `Q${sourceQuestion}`;
+      row.appendChild(circle);
+      const imageRow = document.createElement("div");
+      imageRow.className = "spot-code-grid";
+      for (let column = 1; column <= 4; column++) {
+        const tile = document.createElement("div");
+        tile.className = "spot-tile";
+        const image = document.createElement("img");
+        const isDifference = column === finalRule.positions[rowIndex];
+        image.src = `images/last/${isDifference ? "e/" : ""}${rowName}${column}.png`;
+        image.alt = `${rowName}${column}`;
+        tile.appendChild(image);
+        imageRow.appendChild(tile);
+      }
+      row.appendChild(imageRow);
+      container.appendChild(row);
+    });
+    E("finalAnswerInput").value = "";
+    E("finalWrongMessage").textContent = "";
+    setSubmittedAnswer("finalSubmittedAnswer", "");
+  }
+
+  function checkFinalAnswer() {
+    if (!finalRule || normalize(E("finalAnswerInput").value) !== finalRule.answer) {
+      E("finalWrongMessage").textContent = "どうやら違うようだ。";
+      return;
+    }
+    E("finalWrongMessage").textContent = "";
+    setSubmittedAnswer("finalSubmittedAnswer", E("finalAnswerInput").value);
     window.trackGameEvent?.("game_clear", "team1_sideB");
     showClear();
   }
@@ -550,6 +657,6 @@
     const postText = ending.postText || "『協力しないと出られない部屋からの脱出』をクリアしました！";
     const shareUrl = new URL(".", location.href).href;
     const postUrl = `https://x.com/intent/post?text=${encodeURIComponent(`${postText}\n${shareUrl}`)}`;
-    openModal(`<div class="clear"><h1>CLEAR</h1><h2>脱出成功！</h2><p class="submitted">あなたの答え：${escapeHTML(E("lastAnswerInput").value)}</p><img class="clearimg" src="${escapeHTML(image)}" alt="なぞなすのクリア画像"><p>${escapeHTML(message)}</p><a class="tweet" href="${postUrl}" target="_blank" rel="noopener noreferrer">クリアポスト</a><p class="thanks">THANK YOU FOR PLAYING</p><div class="clear-home-link"><a href="../../">なぞねぎ脱出へ</a></div></div>`);
+    openModal(`<div class="clear"><h1>CLEAR</h1><h2>脱出成功！</h2><p class="submitted">あなたの答え：${escapeHTML(E("finalAnswerInput").value)}</p><img class="clearimg" src="${escapeHTML(image)}" alt="なぞなすのクリア画像"><p>${escapeHTML(message)}</p><a class="tweet" href="${postUrl}" target="_blank" rel="noopener noreferrer">クリアポスト</a><p class="thanks">THANK YOU FOR PLAYING</p><div class="clear-home-link"><a href="../../">なぞねぎ脱出へ</a></div></div>`);
   }
 })();
