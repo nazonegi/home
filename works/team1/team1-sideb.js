@@ -495,8 +495,12 @@
 
   function checkLastAnswer() {
     const side = lastModel?.sideB;
-    if (!side || normalize(E("lastAnswerInput").value) !== side.answer) {
-      E("lastWrongMessage").textContent = "どうやら違うようだ。もう一度確かめよう。";
+    const submittedAnswer = normalize(E("lastAnswerInput").value);
+    if (!side || submittedAnswer !== side.answer) {
+      const isAnswerFromAnotherTime = window.Team1Last?.answers?.some(answer => normalize(answer) === submittedAnswer);
+      E("lastWrongMessage").textContent = isAnswerFromAnotherTime
+        ? "その答えはもう正解ではないようだ。"
+        : "どうやら違うようだ。もう一度確かめよう。";
       return;
     }
     setSubmittedAnswer("lastSubmittedAnswer", E("lastAnswerInput").value);
