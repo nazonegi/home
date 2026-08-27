@@ -33,11 +33,11 @@
     <section class="card team-intro">
       <p class="world-kicker" aria-hidden="true">TWO PLAYER COOPERATIVE ESCAPE</p>
       <h1>協力しないと出られない部屋からの脱出</h1>
-      <p class="mission-copy">二人はそれぞれ別の画面を見ながら、見つけた情報を声に出して共有してください。<br>一人だけでは解けない三つの謎を二人の力で解き明かしたら、脱出成功です。</p>
+      <p class="mission-copy">二人はそれぞれ別の画面を見ながら、見つけた情報を声に出して共有してください。<br>一人だけでは解けない4つの謎を二人の力で解き明かしたら、脱出成功です。</p>
 
       <div class="meta team-meta" aria-label="ゲーム情報">
         <span>難易度：3</span>
-        <span>プレイ時間：45〜60分</span>
+        <span>プレイ時間：45〜90分</span>
         <span>プレイ人数：2人</span>
       </div>
 
@@ -60,14 +60,27 @@
 
       <p class="role-guide">担当するキャラクターを選んでください</p>
       <div class="role-select">
-        <a class="role-card role-a" href="sideA.html" aria-label="なぞねぎとしてゲームを始める">
+        <a class="role-card role-a" href="sideA.html" data-role-name="なぞねぎ" data-character-image="images/start-negi-character.png" aria-label="なぞねぎとしてゲームを始める">
           <img src="images/start-negi.svg" alt="なぞねぎとしてゲームを始める">
         </a>
-        <a class="role-card role-b" href="sideB.html" aria-label="なぞなすとしてゲームを始める">
+        <a class="role-card role-b" href="sideB.html" data-role-name="なぞなす" data-character-image="images/start-nasu-character.png" aria-label="なぞなすとしてゲームを始める">
           <img src="images/start-nasu.svg" alt="なぞなすとしてゲームを始める">
         </a>
       </div>
     </section>
   </main>
+  <dialog id="startConfirmDialog" class="start-confirm-dialog" aria-labelledby="startConfirmTitle">
+    <form method="dialog">
+      <h2 id="startConfirmTitle">ゲームを始めますか？</h2>
+      <img id="startConfirmCharacter" class="start-confirm-character" src="" alt="">
+      <p id="startConfirmMessage"></p>
+      <p class="start-confirm-note">二人の担当が決まっていることを確認してください。</p>
+      <div class="modalactions">
+        <button id="startConfirmCancel" type="submit" value="cancel">キャンセル</button>
+        <button id="startConfirmGo" type="submit" value="confirm">ゲームを始める</button>
+      </div>
+    </form>
+  </dialog>
+  <script src="team1-title.js"></script>
 </body>
 </html>
