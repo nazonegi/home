@@ -556,6 +556,69 @@
   object-fit: cover;
 }
 
+.flip-card-grid {
+  gap: 0;
+}
+
+.flip-card {
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  perspective: 800px;
+  cursor: pointer;
+}
+
+.flip-card::after {
+  border: 1px solid #111;
+  border-radius: 0;
+}
+
+.flip-card-inner {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: 0;
+  transform-style: preserve-3d;
+  transition: transform .46s cubic-bezier(.2, .72, .2, 1);
+}
+
+.flip-card.is-flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  overflow: hidden;
+  border-radius: 0;
+  place-items: center;
+  backface-visibility: hidden;
+}
+
+.flip-card-front {
+  background: #fffaf2;
+}
+
+.flip-card-back {
+  border: 1px solid #111;
+  background: #fffaf2;
+  color: #111;
+  font-size: clamp(2rem, 9vw, 4.5rem);
+  font-weight: 900;
+  text-shadow: none;
+  transform: rotateY(180deg);
+}
+
+.flip-card:focus-visible {
+  outline: 4px solid #f28c28;
+  outline-offset: 3px;
+}
+
 .spot-difference-rows {
   display: grid;
   width: min(100%, 820px);
@@ -576,15 +639,15 @@
 }
 
 .spot-source-circle.source-q1 {
-  width: clamp(30px, 5vw, 36px);
-}
-
-.spot-source-circle.source-q2 {
   width: clamp(38px, 6vw, 44px);
 }
 
+.spot-source-circle.source-q2 {
+  width: clamp(30px, 5vw, 36px);
+}
+
 .spot-source-circle.source-q3 {
-  width: clamp(46px, 7vw, 52px);
+  width: clamp(58px, 9vw, 68px);
 }
 
 .spot-code-grid {
@@ -1029,15 +1092,15 @@
 }
 
 .side-a #question1 .question-number-image {
-  height: clamp(30px, 5vw, 36px);
-}
-
-.side-a #question2 .question-number-image {
   height: clamp(38px, 6vw, 44px);
 }
 
+.side-a #question2 .question-number-image {
+  height: clamp(30px, 5vw, 36px);
+}
+
 .side-a #questionLast .question-number-image {
-  height: clamp(46px, 7vw, 52px);
+  height: clamp(58px, 9vw, 68px);
 }
 
 .last-card .question-header .qlabel { color: var(--side-accent); }

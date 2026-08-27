@@ -90,13 +90,13 @@
     <section id="questionLast" class="card last-card game-question hidden">
       <div class="question-header">
         <h1 class="qlabel"><img class="question-number-image" src="images/sideA/q3-label.png" alt="Q3"></h1>
-        <button id="lastNoticeButton" class="notice-link" type="button">気づく</button>
+        <button id="q3NoticeButton" class="notice-link" type="button">気づく</button>
       </div>
 
       <div id="zodiacStage" class="zodiac-stage" aria-label="動き回る十二支の動物"></div>
       <div class="round-timer">
-        <progress id="roundProgress" max="300" value="300"></progress>
-        <span id="roundTimeText">残り 5:00</span>
+        <progress id="roundProgress" max="60" value="60"></progress>
+        <span id="roundTimeText">残り 1:00</span>
       </div>
 
       <div class="kana-key" aria-label="数字とひらがなの対応">
@@ -121,10 +121,11 @@
     <section id="questionFinal" class="card final-puzzle-card game-question hidden">
       <div class="question-header">
         <h1 class="qlabel">LAST</h1>
+        <button id="finalNoticeButton" class="notice-link" type="button">気づく</button>
       </div>
       <p class="spot-difference-label">まちがい</p>
       <div id="spotDifferenceView" class="spot-difference-view">
-        <div class="spot-difference-grid" aria-label="間違い探しの正しい画像">
+        <div id="negiSpotGrid" class="spot-difference-grid flip-card-grid" aria-label="めくれる12枚の画像">
           <div class="spot-tile"><img src="images/last/A1.png" alt="A1"></div>
           <div class="spot-tile"><img src="images/last/A2.png" alt="A2"></div>
           <div class="spot-tile"><img src="images/last/A3.png" alt="A3"></div>

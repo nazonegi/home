@@ -2,7 +2,7 @@
   "version": "1.0",
   "roundDurationSeconds": 60,
   "blackCurtainEnabled": true,
-  "sizePulseStartSeconds": 1,
+  "sizePulseStartSeconds": 0,
   "speedUpStartSeconds": 30,
   "speedMultiplier": 3.0
 

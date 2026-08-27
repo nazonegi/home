@@ -85,13 +85,13 @@
     <section id="questionLast" class="card last-card game-question hidden">
       <div class="question-header">
         <h1 class="qlabel">Q3</h1>
-        <button id="lastNoticeButton" class="notice-link" type="button">気づく</button>
+        <button id="q3NoticeButton" class="notice-link" type="button">気づく</button>
       </div>
 
       <div id="zodiacStage" class="zodiac-stage" aria-label="動き回る十二支の動物"></div>
       <div class="round-timer">
-        <progress id="roundProgress" max="300" value="300"></progress>
-        <span id="roundTimeText">残り 5:00</span>
+        <progress id="roundProgress" max="60" value="60"></progress>
+        <span id="roundTimeText">残り 1:00</span>
       </div>
 
       <div class="kana-key" aria-label="数字とひらがなの対応">
@@ -116,8 +116,9 @@
     <section id="questionFinal" class="card final-puzzle-card game-question hidden">
       <div class="question-header">
         <h1 class="qlabel">LAST</h1>
+        <button id="finalNoticeButton" class="notice-link" type="button">気づく</button>
       </div>
-      <p class="spot-difference-label">うえから</p>
+      <p class="spot-difference-label">めくれ</p>
       <div id="spotDifferenceView" class="spot-difference-view">
         <div id="spotDifferenceRows" class="spot-difference-rows" aria-label="間違い探しの画像"></div>
         <button id="spotFullscreenClose" class="spot-fullscreen-close" type="button" aria-label="拡大表示を閉じる">×</button>

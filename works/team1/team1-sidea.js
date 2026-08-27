@@ -20,11 +20,12 @@
   let q2Solved = false;
   let q3Solved = false;
   let q3Answer = "";
+  let finalAnswer = "";
   let currentQuestion = 0;
   let mazePosition = [0, 0];
   let routeText = "";
   let cycleTimer;
-  let lastConfig = { roundDurationSeconds: 300, blackCurtainEnabled: true };
+  let lastConfig = { roundDurationSeconds: 60, blackCurtainEnabled: true, sizePulseStartSeconds: 0, speedUpStartSeconds: 30 };
   let clearConfig = {};
   let noticeConfig = {};
   let clockOffsetMs = 0;
@@ -35,13 +36,7 @@
   let curtainReveal = 0;
   let lastCurtainClick = 0;
 
-  const FINAL_ANSWERS = {
-    "い": "かいと", "う": "とうか", "く": "とくい", "し": "としん",
-    "す": "てすと", "せ": "せいと", "そ": "ひそか", "た": "とたん",
-    "と": "かっと", "ふ": "ふとん", "ろ": "ひろい", "ん": "てんと"
-  };
-
-  const MAZE_LETTERS = { "0,3": "み", "1,0": "ん", "2,1": "う", "2,4": "し", "3,3": "い", "4,3": "よ" };
+  const MAZE_LETTERS = { "0,3": "み", "1,0": "く", "2,1": "う", "2,4": "し", "3,3": "た", "4,3": "よ" };
   const BLOCKED = new Set([
     "0,1|1,1", "1,0|2,0", "1,1|2,1", "1,3|2,3", "2,1|3,1", "3,2|4,2", "3,3|4,3",
     "1,2|1,3", "2,2|2,3", "4,0|4,1"
@@ -71,7 +66,8 @@
     E("q2AnswerButton").addEventListener("click", checkMazeAnswer);
     E("q2AnswerInput").addEventListener("keydown", event => { if (event.key === "Enter") checkMazeAnswer(); });
     E("q2AnswerInput").addEventListener("input", saveMaze);
-    E("lastNoticeButton").addEventListener("click", () => showNoticeConfirm("last"));
+    E("q3NoticeButton").addEventListener("click", () => showNoticeConfirm("q3"));
+    E("finalNoticeButton").addEventListener("click", () => showNoticeConfirm("last"));
     E("lastAnswerButton").addEventListener("click", checkLastAnswer);
     E("lastAnswerInput").addEventListener("keydown", event => { if (event.key === "Enter") checkLastAnswer(); });
     E("finalAnswerButton").addEventListener("click", checkFinalAnswer);
@@ -282,6 +278,7 @@
     q2Solved = false;
     q3Solved = false;
     q3Answer = "";
+    finalAnswer = "";
     currentQuestion = 0;
     mazePosition = [0, 0];
     routeText = "";
@@ -293,6 +290,7 @@
     E("lastWrongMessage").textContent = "";
     E("finalAnswerInput").value = "";
     E("finalWrongMessage").textContent = "";
+    E("negiSpotGrid").innerHTML = "";
     ["q1SubmittedAnswer", "q2SubmittedAnswer", "lastSubmittedAnswer", "finalSubmittedAnswer"].forEach(id => setSubmittedAnswer(id, ""));
     localStorage.removeItem(storageKey);
     localStorage.removeItem(mazeStorageKey);
@@ -373,7 +371,7 @@
   }
 
   function checkMazeAnswer() {
-    if (normalize(E("q2AnswerInput").value) !== "かいてん") {
+    if (normalize(E("q2AnswerInput").value) !== "はたらく") {
       E("q2WrongMessage").textContent = "どうやらまちがっているようだ。";
       return;
     }
@@ -414,7 +412,7 @@
 
   async function initLast() {
     await syncLastClock(true);
-    const duration = Math.max(10, Number(lastConfig.roundDurationSeconds) || 300);
+    const duration = Math.max(10, Number(lastConfig.roundDurationSeconds) || 60);
     E("roundProgress").max = duration;
     updateLastRound();
     window.setInterval(updateLastRound, 250);
@@ -435,7 +433,7 @@
   }
 
   function updateLastRound() {
-    const duration = Math.max(10, Number(lastConfig.roundDurationSeconds) || 300);
+    const duration = Math.max(10, Number(lastConfig.roundDurationSeconds) || 60);
     const nowSeconds = (Date.now() + clockOffsetMs) / 1000;
     const roundKey = Math.floor(nowSeconds / duration);
     const remaining = duration - (nowSeconds - roundKey * duration);
@@ -521,13 +519,15 @@
     const stage = E("zodiacStage");
     const width = stage?.clientWidth || 1;
     const height = stage?.clientHeight || 1;
-    const duration = Math.max(10, Number(lastConfig.roundDurationSeconds) || 300);
+    const duration = Math.max(10, Number(lastConfig.roundDurationSeconds) || 60);
     const roundElapsed = lastRoundKey === null
       ? 0
       : (Date.now() + clockOffsetMs) / 1000 - lastRoundKey * duration;
-    const pulseElapsed = Math.max(0, roundElapsed - (Number(lastConfig.sizePulseStartSeconds) || 20));
+    const configuredPulseStart = Number(lastConfig.sizePulseStartSeconds);
+    const pulseStart = Number.isFinite(configuredPulseStart) ? configuredPulseStart : 0;
+    const pulseElapsed = Math.max(0, roundElapsed - pulseStart);
     const pulseBlend = Math.min(1, pulseElapsed);
-    const speedUpStart = Number(lastConfig.speedUpStartSeconds) || 40;
+    const speedUpStart = Number(lastConfig.speedUpStartSeconds) || 30;
     const speedMultiplier = roundElapsed >= speedUpStart
       ? Math.max(1, Number(lastConfig.speedMultiplier) || 1.5)
       : 1;
@@ -582,15 +582,64 @@
     setSubmittedAnswer("lastSubmittedAnswer", E("lastAnswerInput").value);
     q3Solved = true;
     q3Answer = side.answer;
+    renderNegiFinalCards();
     updateQuestionNav();
     openModal('<h2 id="modalTitle">正解！</h2><p>Q3を解き明かした！</p><div class="modalactions"><button id="goFinal" type="button">LASTへ</button></div>');
     E("goFinal").addEventListener("click", () => { closeModal(); showQuestion(3); });
   }
 
+  function renderNegiFinalCards() {
+    const characters = [...q3Answer];
+    const useOpenedAnswer = characters.includes("い");
+    const q3Character = useOpenedAnswer ? "い" : "く";
+    const q3Position = characters.indexOf(q3Character) + 1;
+    finalAnswer = useOpenedAnswer ? "ひらいた" : "ひらく";
+
+    const fixedNumbers = new Map([
+      ["A1", 1],
+      ["B3", 2],
+      [`C${q3Position}`, 3]
+    ]);
+    if (useOpenedAnswer) fixedNumbers.set("B2", 4);
+
+    const random = window.Team1Last.randomFrom(window.Team1Last.hash(`team1:final-cards:${q3Answer}:${Date.now()}:${performance.now()}`));
+    const grid = E("negiSpotGrid");
+    grid.innerHTML = "";
+    ["A", "B", "C"].forEach(rowName => {
+      const fixedInRow = new Map();
+      for (let column = 1; column <= 4; column++) {
+        const coordinate = `${rowName}${column}`;
+        if (fixedNumbers.has(coordinate)) fixedInRow.set(column, fixedNumbers.get(coordinate));
+      }
+      const availableNumbers = [1, 2, 3, 4].filter(number => ![...fixedInRow.values()].includes(number));
+      for (let index = availableNumbers.length - 1; index > 0; index--) {
+        const swapIndex = Math.floor(random() * (index + 1));
+        [availableNumbers[index], availableNumbers[swapIndex]] = [availableNumbers[swapIndex], availableNumbers[index]];
+      }
+
+      for (let column = 1; column <= 4; column++) {
+        const coordinate = `${rowName}${column}`;
+        const number = fixedInRow.get(column) || availableNumbers.shift();
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "spot-tile flip-card";
+        card.setAttribute("aria-label", `${coordinate}のカードをめくる`);
+        card.setAttribute("aria-pressed", "false");
+        card.innerHTML = `<span class="flip-card-inner"><span class="flip-card-face flip-card-front"><img src="images/last/${coordinate}.png" alt="${coordinate}"></span><span class="flip-card-face flip-card-back" aria-hidden="true">${number}</span></span>`;
+        card.addEventListener("click", () => {
+          const isFlipped = card.classList.toggle("is-flipped");
+          card.setAttribute("aria-pressed", String(isFlipped));
+        });
+        grid.appendChild(card);
+      }
+    });
+    E("finalAnswerInput").value = "";
+    E("finalWrongMessage").textContent = "";
+    setSubmittedAnswer("finalSubmittedAnswer", "");
+  }
+
   function checkFinalAnswer() {
-    const sourceCharacter = [...q3Answer][2];
-    const correctAnswer = FINAL_ANSWERS[sourceCharacter];
-    if (!correctAnswer || normalize(E("finalAnswerInput").value) !== correctAnswer) {
+    if (!finalAnswer || normalize(E("finalAnswerInput").value) !== finalAnswer) {
       E("finalWrongMessage").textContent = "どうやら違うようだ。";
       return;
     }

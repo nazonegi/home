@@ -23,7 +23,7 @@
   let currentQuestion = 0;
   let mazePosition = [0, 4];
   let routeText = "";
-  let lastConfig = { roundDurationSeconds: 300, blackCurtainEnabled: true };
+  let lastConfig = { roundDurationSeconds: 60, blackCurtainEnabled: true, sizePulseStartSeconds: 0, speedUpStartSeconds: 30 };
   let clearConfig = {};
   let noticeConfig = {};
   let clockOffsetMs = 0;
@@ -34,22 +34,21 @@
   let curtainReveal = 0;
   let lastCurtainClick = 0;
 
-  const FINAL_RULES = {
-    "い": { answer: "かいと", sources: [2, 3, 1], positions: [1, 3, 3] },
-    "う": { answer: "とうか", sources: [1, 3, 2], positions: [3, 3, 1] },
-    "く": { answer: "とくい", sources: [1, 3, 2], positions: [3, 3, 2] },
-    "し": { answer: "としん", sources: [1, 3, 2], positions: [3, 3, 4] },
-    "す": { answer: "てすと", sources: [2, 3, 1], positions: [3, 3, 3] },
-    "せ": { answer: "せいと", sources: [3, 2, 1], positions: [3, 2, 3] },
-    "そ": { answer: "ひそか", sources: [1, 3, 2], positions: [1, 3, 1] },
-    "た": { answer: "とたん", sources: [1, 3, 2], positions: [3, 3, 4] },
-    "と": { answer: "かっと", sources: [2, 1, 3], positions: [1, 2, 3] },
-    "ふ": { answer: "ふとん", sources: [3, 1, 2], positions: [3, 3, 4] },
-    "ろ": { answer: "ひろい", sources: [1, 3, 2], positions: [1, 3, 2] },
-    "ん": { answer: "てんと", sources: [2, 3, 1], positions: [3, 3, 3] }
-  };
+  function createFinalRule(answer) {
+    const characters = [...answer];
+    const useOpenedAnswer = characters.includes("い");
+    const q3Character = useOpenedAnswer ? "い" : "く";
+    const q3Position = characters.indexOf(q3Character) + 1;
+    if (q3Position <= 0) return null;
+    return {
+      answer: useOpenedAnswer ? "ひらいた" : "ひらく",
+      positions: useOpenedAnswer
+        ? [[1], [2, 3], [q3Position]]
+        : [[1], [3], [q3Position]]
+    };
+  }
 
-  const MAZE_LETTERS = { "0,1": "み", "1,0": "ぎ", "1,2": "て", "2,4": "か", "3,3": "か", "4,1": "ら" };
+  const MAZE_LETTERS = { "0,1": "み", "1,0": "ぎ", "1,2": "ら", "2,4": "は", "3,3": "か", "4,1": "ら" };
   const BLOCKED = new Set([
     "0,3|1,3", "1,3|2,3", "2,1|3,1", "3,0|4,0", "3,1|4,1",
     "1,0|1,1", "1,1|1,2", "2,1|2,2", "3,2|3,3", "2,3|2,4"
@@ -77,7 +76,8 @@
     E("q2AnswerButton").addEventListener("click", checkMazeAnswer);
     E("q2AnswerInput").addEventListener("keydown", event => { if (event.key === "Enter") checkMazeAnswer(); });
     E("q2AnswerInput").addEventListener("input", saveMaze);
-    E("lastNoticeButton").addEventListener("click", () => showNoticeConfirm("last"));
+    E("q3NoticeButton").addEventListener("click", () => showNoticeConfirm("q3"));
+    E("finalNoticeButton").addEventListener("click", () => showNoticeConfirm("last"));
     E("lastAnswerButton").addEventListener("click", checkLastAnswer);
     E("lastAnswerInput").addEventListener("keydown", event => { if (event.key === "Enter") checkLastAnswer(); });
     E("finalAnswerButton").addEventListener("click", checkFinalAnswer);
@@ -372,7 +372,7 @@
   }
 
   function checkMazeAnswer() {
-    if (normalize(E("q2AnswerInput").value) !== "かいてん") {
+    if (normalize(E("q2AnswerInput").value) !== "はたらく") {
       E("q2WrongMessage").textContent = "どうやらまちがっているようだ。";
       return;
     }
@@ -413,7 +413,7 @@
 
   async function initLast() {
     await syncLastClock(true);
-    const duration = Math.max(10, Number(lastConfig.roundDurationSeconds) || 300);
+    const duration = Math.max(10, Number(lastConfig.roundDurationSeconds) || 60);
     E("roundProgress").max = duration;
     updateLastRound();
     window.setInterval(updateLastRound, 250);
@@ -434,7 +434,7 @@
   }
 
   function updateLastRound() {
-    const duration = Math.max(10, Number(lastConfig.roundDurationSeconds) || 300);
+    const duration = Math.max(10, Number(lastConfig.roundDurationSeconds) || 60);
     const nowSeconds = (Date.now() + clockOffsetMs) / 1000;
     const roundKey = Math.floor(nowSeconds / duration);
     const remaining = duration - (nowSeconds - roundKey * duration);
@@ -520,13 +520,15 @@
     const stage = E("zodiacStage");
     const width = stage?.clientWidth || 1;
     const height = stage?.clientHeight || 1;
-    const duration = Math.max(10, Number(lastConfig.roundDurationSeconds) || 300);
+    const duration = Math.max(10, Number(lastConfig.roundDurationSeconds) || 60);
     const roundElapsed = lastRoundKey === null
       ? 0
       : (Date.now() + clockOffsetMs) / 1000 - lastRoundKey * duration;
-    const pulseElapsed = Math.max(0, roundElapsed - (Number(lastConfig.sizePulseStartSeconds) || 20));
+    const configuredPulseStart = Number(lastConfig.sizePulseStartSeconds);
+    const pulseStart = Number.isFinite(configuredPulseStart) ? configuredPulseStart : 0;
+    const pulseElapsed = Math.max(0, roundElapsed - pulseStart);
     const pulseBlend = Math.min(1, pulseElapsed);
-    const speedUpStart = Number(lastConfig.speedUpStartSeconds) || 40;
+    const speedUpStart = Number(lastConfig.speedUpStartSeconds) || 30;
     const speedMultiplier = roundElapsed >= speedUpStart
       ? Math.max(1, Number(lastConfig.speedMultiplier) || 1.5)
       : 1;
@@ -581,7 +583,7 @@
     setSubmittedAnswer("lastSubmittedAnswer", E("lastAnswerInput").value);
     q3Solved = true;
     q3Answer = side.answer;
-    finalRule = FINAL_RULES[[...q3Answer][2]] || null;
+    finalRule = createFinalRule(q3Answer);
     renderSpotDifference();
     updateQuestionNav();
     openModal('<h2 id="modalTitle">正解！</h2><p>Q3を解き明かした！</p><div class="modalactions"><button id="goFinal" type="button">LASTへ</button></div>');
@@ -596,7 +598,7 @@
       const row = document.createElement("div");
       row.className = "spot-code-row";
       const circle = document.createElement("img");
-      const sourceQuestion = finalRule.sources[rowIndex];
+      const sourceQuestion = rowIndex + 1;
       circle.className = `spot-source-circle source-q${sourceQuestion}`;
       circle.src = `images/last/q${sourceQuestion}-circle.png`;
       circle.alt = `Q${sourceQuestion}`;
@@ -607,7 +609,7 @@
         const tile = document.createElement("div");
         tile.className = "spot-tile";
         const image = document.createElement("img");
-        const isDifference = column === finalRule.positions[rowIndex];
+        const isDifference = finalRule.positions[rowIndex].includes(column);
         image.src = `images/last/${isDifference ? "e/" : ""}${rowName}${column}.png`;
         image.alt = `${rowName}${column}`;
         tile.appendChild(image);
