@@ -15,6 +15,7 @@
   const storageKey = `neginazo_team1_${pageSide}_q1`;
   const mazeStorageKey = `neginazo_team1_${pageSide}_q2`;
   const q3StorageKey = `neginazo_team1_${pageSide}_q3`;
+  const assistStorageKey = `neginazo_team1_${pageSide}_assist`;
   const E = id => document.getElementById(id);
   let selected = new Set();
   let q1Solved = false;
@@ -27,7 +28,7 @@
   let mazePosition = [0, 0];
   let routeText = "";
   let cycleTimer;
-  let lastConfig = { roundDurationSeconds: 60, blackCurtainEnabled: true, sizePulseStartSeconds: 0, speedUpStartSeconds: 30 };
+  let lastConfig = { roundDurationSeconds: 60, blackCurtainEnabled: true, sizePulseStartSeconds: 0, speedUpStartSeconds: 30, assistDebugEnabled: true };
   let clearConfig = {};
   let noticeConfig = {};
   let clockOffsetMs = 0;
@@ -37,6 +38,10 @@
   let lastFrameTime = performance.now();
   let curtainReveal = 0;
   let lastCurtainClick = 0;
+  let q1StartedAt = Date.now();
+  let q3StartedAt = 0;
+  let q1AssistLevelFrozen = null;
+  let q3AssistLevelFrozen = null;
 
   const MAZE_LETTERS = { "0,3": "み", "1,0": "く", "2,1": "う", "2,4": "し", "3,3": "た", "4,3": "よ" };
   const BLOCKED = new Set([
@@ -50,6 +55,7 @@
     window.trackGameEvent?.("game_start", "team1_sideA");
     buildGrid();
     restore();
+    restoreAssistTimers();
     setupImages();
     startCycle();
     E("answerButton").addEventListener("click", checkAnswer);
@@ -89,6 +95,7 @@
     initLast();
     loadClearConfig();
     loadNoticeConfig();
+    initAssistDebug();
     requestAnimationFrame(animateZodiac);
     window.setInterval(decayCurtain, 100);
   }
@@ -134,13 +141,14 @@
 
   function runCycle() {
     RUNNERS.forEach(runner => {
-      const latestStart = Math.max(0, CYCLE_SECONDS - runner.duration);
+      const duration = getQ1RunnerDuration(runner);
+      const latestStart = Math.max(0, CYCLE_SECONDS - duration);
       const delaySeconds = runner.id === "A" ? 0 : Math.random() * latestStart;
-      window.setTimeout(() => animateRunner(runner), delaySeconds * 1000);
+      window.setTimeout(() => animateRunner(runner, duration), delaySeconds * 1000);
     });
   }
 
-  function animateRunner(runner) {
+  function animateRunner(runner, duration = runner.duration) {
     const lane = E("imageLane");
     const image = document.querySelector(`[data-runner="${runner.id}"]`);
     const imageWidth = image.getBoundingClientRect().width || 72;
@@ -150,8 +158,26 @@
         { transform: `translateX(${lane.clientWidth + imageWidth}px)`, opacity: 1 },
         { transform: `translateX(${-imageWidth}px)`, opacity: 1 }
       ],
-      { duration: runner.duration * 1000, easing: "linear", fill: "none" }
+      { duration: duration * 1000, easing: "linear", fill: "none" }
     );
+  }
+
+  function getQ1RunnerDuration(runner) {
+    if (runner.id === "A") return runner.duration;
+    const level = getQ1AssistLevel();
+    return Math.min(CYCLE_SECONDS * 0.9, runner.duration * (1 + level * 0.15));
+  }
+
+  function getQ1AssistLevel() {
+    if (Number.isInteger(q1AssistLevelFrozen)) return q1AssistLevelFrozen;
+    const elapsed = Math.max(0, Date.now() - q1StartedAt);
+    const stepMs = getAssistStepMs();
+    return Math.min(3, Math.max(0, Math.floor((elapsed - stepMs) / stepMs) + 1));
+  }
+
+  function getAssistStepMs() {
+    const panel = E("assistDebugPanel");
+    return lastConfig.assistDebugEnabled !== false && panel && !panel.hidden ? 60000 : 5 * 60000;
   }
 
   async function openLaneFullscreen() {
@@ -212,7 +238,9 @@
     }
     E("wrongMessage").textContent = "";
     setSubmittedAnswer("q1SubmittedAnswer", E("answerInput").value);
+    q1AssistLevelFrozen = getQ1AssistLevel();
     q1Solved = true;
+    saveAssistTimers();
     save(true);
     updateQuestionNav();
     openModal('<h2 id="modalTitle">正解！</h2><p>Q1を解き明かした！</p><div class="modalactions"><button id="goQ2" type="button">Q2へ</button></div>');
@@ -242,9 +270,22 @@
     const fallbacks = {
       q1: [{ type: "text", content: "まずは二人で、お互いの画面に流れる絵について話してみよう。" }],
       q2: [{ type: "text", content: "自分の迷路は相手の画面にあります。相手の案内を聞いて、上下左右のボタンを押そう。" }],
-      last: [{ type: "text", content: "指定された動物が、それぞれ何匹いるか数えてみよう。" }]
+      q3: [{ type: "text", content: "指定された動物が、それぞれ何匹いるか数えてみよう。" }],
+      last: [{ type: "text", content: "お互いの絵を教えあって、違うところを確かめよう。" }]
     };
-    const notices = noticeConfig.sideA?.[question] || fallbacks[question] || [];
+    const notices = [...(noticeConfig.sideA?.[question] || fallbacks[question] || [])];
+    if (question === "last" && q3Answer) {
+      notices.forEach((notice, noticeIndex) => {
+        if (notice.type === "text") notices[noticeIndex] = { ...notice, content: notice.content.split("{{Q3_ANSWER}}").join(q3Answer) };
+      });
+    }
+    if (question === "q3") {
+      const currentAnswer = lastModel?.[pageSide]?.answer || lastModel?.sideA?.answer;
+      if (currentAnswer) notices.push({ type: "text", content: `現在のQ3の答えは「${currentAnswer}」` });
+    }
+    if (question === "last" && finalAnswer) {
+      notices.push({ type: "text", content: `現在のLASTの答えは「${finalAnswer}」` });
+    }
     if (!notices.length) return;
     const safeIndex = Math.max(0, Math.min(index, notices.length - 1));
     const notice = notices[safeIndex];
@@ -299,6 +340,12 @@
     localStorage.removeItem(storageKey);
     localStorage.removeItem(mazeStorageKey);
     localStorage.removeItem(q3StorageKey);
+    localStorage.removeItem(assistStorageKey);
+    q1StartedAt = Date.now();
+    q3StartedAt = 0;
+    q1AssistLevelFrozen = null;
+    q3AssistLevelFrozen = null;
+    saveAssistTimers();
     renderGrid();
     renderMazeState();
     showQuestion(0);
@@ -331,6 +378,10 @@
   function showQuestion(index) {
     if (index < 0 || index > 3 || (index === 1 && !q1Solved) || (index === 2 && !q2Solved) || (index === 3 && !q3Solved)) return;
     currentQuestion = index;
+    if (index === 2 && !q3StartedAt) {
+      q3StartedAt = Date.now();
+      saveAssistTimers();
+    }
     E("question1").classList.toggle("hidden", index !== 0);
     E("q1AnswerCard").classList.toggle("hidden", index !== 0);
     E("question2").classList.toggle("hidden", index !== 1);
@@ -424,11 +475,75 @@
     }));
   }
 
+  function saveAssistTimers() {
+    localStorage.setItem(assistStorageKey, JSON.stringify({ q1StartedAt, q3StartedAt, q1AssistLevelFrozen, q3AssistLevelFrozen }));
+  }
+
+  function restoreAssistTimers() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(assistStorageKey));
+      q1StartedAt = Number.isFinite(saved?.q1StartedAt) ? saved.q1StartedAt : Date.now();
+      q3StartedAt = Number.isFinite(saved?.q3StartedAt) ? saved.q3StartedAt : 0;
+      q1AssistLevelFrozen = Number.isInteger(saved?.q1AssistLevelFrozen) ? saved.q1AssistLevelFrozen : null;
+      q3AssistLevelFrozen = Number.isInteger(saved?.q3AssistLevelFrozen) ? saved.q3AssistLevelFrozen : null;
+      if (q1Solved && !Number.isInteger(q1AssistLevelFrozen)) q1AssistLevelFrozen = getQ1AssistLevel();
+    } catch (_) {
+      q1StartedAt = Date.now();
+      q3StartedAt = 0;
+      q1AssistLevelFrozen = null;
+      q3AssistLevelFrozen = null;
+    }
+    saveAssistTimers();
+  }
+
+  function getQ3Ease() {
+    const level = getQ3AssistLevel();
+    return Math.max(0.1, 1 - level * 0.15);
+  }
+
+  function getQ3AssistLevel() {
+    if (Number.isInteger(q3AssistLevelFrozen)) return q3AssistLevelFrozen;
+    if (!q3StartedAt) return 0;
+    return Math.min(6, Math.floor(Math.max(0, Date.now() - q3StartedAt) / getAssistStepMs()));
+  }
+
+  function initAssistDebug() {
+    if (sessionStorage.getItem(`${assistStorageKey}_debug_hidden`) === "1") return;
+    const panel = document.createElement("aside");
+    panel.id = "assistDebugPanel";
+    panel.className = "assist-debug-panel";
+    panel.innerHTML = '<button type="button" aria-label="テスト表示を閉じる">×</button><strong>難易度調整テスト</strong><div></div>';
+    panel.querySelector("button").addEventListener("click", () => {
+      sessionStorage.setItem(`${assistStorageKey}_debug_hidden`, "1");
+      panel.remove();
+    });
+    document.body.appendChild(panel);
+    updateAssistDebug();
+    window.setInterval(updateAssistDebug, 1000);
+  }
+
+  function updateAssistDebug() {
+    const panel = E("assistDebugPanel");
+    if (!panel) return;
+    panel.hidden = lastConfig.assistDebugEnabled === false;
+    if (panel.hidden) return;
+    const formatElapsed = startedAt => {
+      if (!startedAt) return "未開始";
+      const seconds = Math.floor(Math.max(0, Date.now() - startedAt) / 1000);
+      return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+    };
+    const q1Percent = `${getQ1AssistLevel() * 15}%減速${q1Solved ? "（固定）" : ""}`;
+    const q3Percent = `${Math.round((1 - getQ3Ease()) * 100)}%緩和${q3Solved ? "（固定）" : ""}`;
+    panel.querySelector("div").innerHTML = `判定間隔：1分（テスト）<br>Q1 ${formatElapsed(q1StartedAt)}／${q1Percent}<br>Q3 ${formatElapsed(q3StartedAt)}／${q3Percent}`;
+  }
+
   function restoreQ3() {
     try {
       const saved = JSON.parse(localStorage.getItem(q3StorageKey));
       if (!saved?.solved || !window.Team1Last?.answers?.includes(saved.answer)) return;
+      if (!Number.isInteger(q3AssistLevelFrozen)) q3AssistLevelFrozen = getQ3AssistLevel();
       q3Solved = true;
+      saveAssistTimers();
       q3Answer = saved.answer;
       E("lastAnswerInput").value = saved.submittedAnswer || saved.answer;
       setSubmittedAnswer("lastSubmittedAnswer", saved.submittedAnswer || saved.answer);
@@ -482,7 +597,8 @@
     const random = window.Team1Last.randomFrom(side.motionSeed);
     const sizeLevels = [36, 44, 52, 60, 68];
     const balancedSizes = side.tokens.map((_, index) => sizeLevels[index % sizeLevels.length]);
-    const speedLevels = [0.024, 0.042, 0.060, 0.078, 0.096];
+    const ease = getQ3Ease();
+    const speedLevels = [0.024, 0.042, 0.060, 0.078, 0.096].map(speed => 0.06 + (speed - 0.06) * ease);
     const balancedSpeeds = side.tokens.map((_, index) => speedLevels[index % speedLevels.length]);
     for (let i = balancedSizes.length - 1; i > 0; i--) {
       const j = Math.floor(random() * (i + 1));
@@ -507,8 +623,8 @@
         size: balancedSizes[index],
         sizePhase: random() * Math.PI * 2,
         sizePeriod: 0.8 + random() * 1.8,
-        sizeMin: 0.72 + random() * 0.16,
-        sizeMax: 1.12 + random() * 0.28,
+        sizeMin: 1 + ((0.72 + random() * 0.16) - 1) * ease,
+        sizeMax: 1 + ((1.12 + random() * 0.28) - 1) * ease,
         index
       };
       image.style.width = `${sprite.size}px`;
@@ -556,8 +672,10 @@
     const pulseElapsed = Math.max(0, roundElapsed - pulseStart);
     const pulseBlend = Math.min(1, pulseElapsed);
     const speedUpStart = Number(lastConfig.speedUpStartSeconds) || 30;
+    const ease = getQ3Ease();
+    const configuredSpeedMultiplier = Math.max(1, Number(lastConfig.speedMultiplier) || 1.5);
     const speedMultiplier = roundElapsed >= speedUpStart
-      ? Math.max(1, Number(lastConfig.speedMultiplier) || 1.5)
+      ? 1 + (configuredSpeedMultiplier - 1) * ease
       : 1;
     lastSprites.forEach(sprite => {
       sprite.x += sprite.vx * delta * speedMultiplier;
@@ -608,7 +726,9 @@
     }
     E("lastWrongMessage").textContent = "";
     setSubmittedAnswer("lastSubmittedAnswer", E("lastAnswerInput").value);
+    q3AssistLevelFrozen = getQ3AssistLevel();
     q3Solved = true;
+    saveAssistTimers();
     q3Answer = side.answer;
     renderNegiFinalCards();
     saveQ3();

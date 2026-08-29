@@ -4,6 +4,7 @@
   "blackCurtainEnabled": true,
   "sizePulseStartSeconds": 0,
   "speedUpStartSeconds": 30,
-  "speedMultiplier": 3.0
+  "speedMultiplier": 3.0,
+  "assistDebugEnabled": false
 
 }

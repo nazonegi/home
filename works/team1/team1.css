@@ -1241,6 +1241,38 @@
   justify-content: center;
 }
 
+.assist-debug-panel {
+  position: fixed;
+  right: max(8px, env(safe-area-inset-right));
+  bottom: max(8px, env(safe-area-inset-bottom));
+  z-index: 1500;
+  min-width: 210px;
+  padding: 12px 38px 12px 14px;
+  border: 2px solid #222;
+  background: rgba(255, 255, 255, .94);
+  color: #111;
+  font: 13px/1.55 monospace;
+  box-shadow: 0 5px 18px #0004;
+}
+
+.assist-debug-panel[hidden] { display: none; }
+
+.assist-debug-panel strong { display: block; margin-bottom: 4px; }
+
+.assist-debug-panel button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 28px;
+  height: 28px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 0;
+  background: #222;
+  color: #fff;
+  line-height: 1;
+}
+
 .clear h1 {
   margin: 0;
   color: #f2ad18;
