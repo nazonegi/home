@@ -14,6 +14,7 @@
   const assetRoot = `images/${pageSide}/`;
   const storageKey = `neginazo_team1_${pageSide}_q1`;
   const mazeStorageKey = `neginazo_team1_${pageSide}_q2`;
+  const q3StorageKey = `neginazo_team1_${pageSide}_q3`;
   const E = id => document.getElementById(id);
   let selected = new Set();
   let q1Solved = false;
@@ -21,6 +22,7 @@
   let q3Solved = false;
   let q3Answer = "";
   let finalAnswer = "";
+  let finalCardNumbers = null;
   let currentQuestion = 0;
   let mazePosition = [0, 0];
   let routeText = "";
@@ -82,6 +84,7 @@
     E("modal").addEventListener("click", event => { if (event.target === E("modal")) closeModal(); });
     document.addEventListener("keydown", event => { if (event.key === "Escape") { closeModal(); closeViewer(); } });
     restoreMaze();
+    restoreQ3();
     updateQuestionNav();
     initLast();
     loadClearConfig();
@@ -279,6 +282,7 @@
     q3Solved = false;
     q3Answer = "";
     finalAnswer = "";
+    finalCardNumbers = null;
     currentQuestion = 0;
     mazePosition = [0, 0];
     routeText = "";
@@ -294,6 +298,7 @@
     ["q1SubmittedAnswer", "q2SubmittedAnswer", "lastSubmittedAnswer", "finalSubmittedAnswer"].forEach(id => setSubmittedAnswer(id, ""));
     localStorage.removeItem(storageKey);
     localStorage.removeItem(mazeStorageKey);
+    localStorage.removeItem(q3StorageKey);
     renderGrid();
     renderMazeState();
     showQuestion(0);
@@ -408,6 +413,29 @@
       }
     } catch { /* Ignore invalid saved data. */ }
     renderMazeState();
+  }
+
+  function saveQ3() {
+    localStorage.setItem(q3StorageKey, JSON.stringify({
+      solved: q3Solved,
+      answer: q3Answer,
+      submittedAnswer: E("lastAnswerInput")?.value || "",
+      cardNumbers: finalCardNumbers
+    }));
+  }
+
+  function restoreQ3() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(q3StorageKey));
+      if (!saved?.solved || !window.Team1Last?.answers?.includes(saved.answer)) return;
+      q3Solved = true;
+      q3Answer = saved.answer;
+      E("lastAnswerInput").value = saved.submittedAnswer || saved.answer;
+      setSubmittedAnswer("lastSubmittedAnswer", saved.submittedAnswer || saved.answer);
+      renderNegiFinalCards(saved.cardNumbers);
+    } catch (_) {
+      localStorage.removeItem(q3StorageKey);
+    }
   }
 
   async function initLast() {
@@ -583,12 +611,13 @@
     q3Solved = true;
     q3Answer = side.answer;
     renderNegiFinalCards();
+    saveQ3();
     updateQuestionNav();
     openModal('<h2 id="modalTitle">正解！</h2><p>Q3を解き明かした！</p><div class="modalactions"><button id="goFinal" type="button">LASTへ</button></div>');
     E("goFinal").addEventListener("click", () => { closeModal(); showQuestion(3); });
   }
 
-  function renderNegiFinalCards() {
+  function renderNegiFinalCards(savedCardNumbers = null) {
     const characters = [...q3Answer];
     const useOpenedAnswer = characters.includes("い");
     const q3Character = useOpenedAnswer ? "い" : "く";
@@ -605,6 +634,9 @@
     const random = window.Team1Last.randomFrom(window.Team1Last.hash(`team1:final-cards:${q3Answer}:${Date.now()}:${performance.now()}`));
     const grid = E("negiSpotGrid");
     grid.innerHTML = "";
+    const coordinates = ["A", "B", "C"].flatMap(rowName => [1, 2, 3, 4].map(column => `${rowName}${column}`));
+    const useSavedNumbers = savedCardNumbers && coordinates.every(coordinate => [1, 2, 3, 4].includes(savedCardNumbers[coordinate]));
+    finalCardNumbers = {};
     ["A", "B", "C"].forEach(rowName => {
       const fixedInRow = new Map();
       for (let column = 1; column <= 4; column++) {
@@ -619,7 +651,8 @@
 
       for (let column = 1; column <= 4; column++) {
         const coordinate = `${rowName}${column}`;
-        const number = fixedInRow.get(column) || availableNumbers.shift();
+        const number = useSavedNumbers ? savedCardNumbers[coordinate] : (fixedInRow.get(column) || availableNumbers.shift());
+        finalCardNumbers[coordinate] = number;
         const card = document.createElement("button");
         card.type = "button";
         card.className = "spot-tile flip-card";

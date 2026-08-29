@@ -339,6 +339,10 @@
   border-radius: 0;
   background: transparent;
   color: #111;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .direction-triangle {
@@ -349,6 +353,7 @@
   border-bottom: clamp(46px, 13vw, 62px) solid #111;
   border-left: clamp(30px, 9vw, 42px) solid transparent;
   transform-origin: 50% 60%;
+  pointer-events: none;
 }
 
 .maze-controller [data-move="right"] .direction-triangle { transform: rotate(90deg); }
