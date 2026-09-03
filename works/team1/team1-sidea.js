@@ -1,21 +1,10 @@
 (() => {
   "use strict";
 
-  const LETTERS = ["た", "も", "お", "じ", "と", "ど", "ち", "ゅ", "う", "こ", "ふ", "し", "ま", "て", "ん"];
-  const RUNNERS = [
-    { id: "A", file: "a-tanuki.png", duration: 5 },
-    { id: "B", file: "b-knight.png", duration: 0.5 },
-    { id: "C", file: "c-dress.png", duration: 0.5 },
-    { id: "D", file: "d-knife.png", duration: 0.3 }
-  ];
-  const CYCLE_SECONDS = 5;
-  const CYCLE_MS = CYCLE_SECONDS * 1000;
   const pageSide = location.pathname.split("/").pop().replace(/\.html$/i, "") || "sideA";
-  const assetRoot = `images/${pageSide}/`;
   const storageKey = `neginazo_team1_${pageSide}_q1`;
   const mazeStorageKey = `neginazo_team1_${pageSide}_q2`;
   const q3StorageKey = `neginazo_team1_${pageSide}_q3`;
-  const assistStorageKey = `neginazo_team1_${pageSide}_assist`;
   const E = id => document.getElementById(id);
   let selected = new Set();
   let q1Solved = false;
@@ -27,23 +16,54 @@
   let currentQuestion = 0;
   let mazePosition = [0, 0];
   let routeText = "";
-  let cycleTimer;
-  let lastConfig = { roundDurationSeconds: 60, blackCurtainEnabled: true, sizePulseStartSeconds: 0, speedUpStartSeconds: 30, assistDebugEnabled: true };
+  let lastConfig = { roundDurationSeconds: 60 };
   let clearConfig = {};
   let noticeConfig = {};
   let clockOffsetMs = 0;
   let lastRoundKey = null;
   let lastModel = null;
+  let q2RoundKey = null;
+  let q2Model = null;
+  let restoredQ2Progress = null;
+  let q2SolvedAnswer = "";
   let lastSprites = [];
+  let q1RoundStage = 0;
+  let restoredQ1Progress = null;
   let lastFrameTime = performance.now();
-  let curtainReveal = 0;
-  let lastCurtainClick = 0;
-  let q1StartedAt = Date.now();
-  let q3StartedAt = 0;
-  let q1AssistLevelFrozen = null;
-  let q3AssistLevelFrozen = null;
+  let modalCloseAction = null;
 
-  const MAZE_LETTERS = { "0,3": "み", "1,0": "く", "2,1": "う", "2,4": "し", "3,3": "た", "4,3": "よ" };
+  function getLinkedOutcome() {
+    return window.Team1Last?.createLinkedOutcome(q3Answer, q2SolvedAnswer) || null;
+  }
+
+  function getLinkedOutcomeKey() {
+    const outcome = getLinkedOutcome();
+    return outcome ? `${outcome.q1Answer}|${outcome.q2Answer}` : "";
+  }
+
+  function resetQ3WhenOutcomeChanges(previousKey) {
+    const currentKey = getLinkedOutcomeKey();
+    if (!q2Solved || !previousKey || !currentKey || previousKey === currentKey) return false;
+    q2Solved = false;
+    mazePosition = [0, 0];
+    routeText = "";
+    finalAnswer = "";
+    finalCardNumbers = null;
+    E("finalLengthHint").textContent = "";
+    E("q2AnswerInput").value = "";
+    E("q2WrongMessage").textContent = "";
+    E("mazeMessage").textContent = "";
+    setSubmittedAnswer("q2SubmittedAnswer", "");
+    E("negiSpotGrid").innerHTML = "";
+    renderMazeState();
+    saveMaze();
+    return true;
+  }
+
+  function getMazeLetters() {
+    const characters = [...(getLinkedOutcome()?.q3Answer || "はたらく")];
+    return { "0,3": "み", "1,0": characters[3], "2,1": "う", "2,4": "し", "3,3": characters[1], "4,3": "よ" };
+  }
   const BLOCKED = new Set([
     "0,1|1,1", "1,0|2,0", "1,1|2,1", "1,3|2,3", "2,1|3,1", "3,2|4,2", "3,3|4,3",
     "1,2|1,3", "2,2|2,3", "4,0|4,1"
@@ -55,12 +75,9 @@
     window.trackGameEvent?.("game_start", "team1_sideA");
     buildGrid();
     restore();
-    restoreAssistTimers();
-    setupImages();
-    startCycle();
     E("answerButton").addEventListener("click", checkAnswer);
     E("answerInput").addEventListener("keydown", event => { if (event.key === "Enter") checkAnswer(); });
-    E("noticeButton").addEventListener("click", () => showNoticeConfirm("q1"));
+    E("noticeButton").addEventListener("click", () => showNoticeConfirm("q2"));
     document.querySelectorAll(".progress-reset-button").forEach(button => button.addEventListener("click", showResetConfirm));
     E("laneFullscreenButton").addEventListener("click", openLaneFullscreen);
     E("laneFullscreenClose").addEventListener("click", closeLaneFullscreen);
@@ -68,13 +85,13 @@
     E("spotFullscreenButton").addEventListener("click", openSpotFullscreen);
     E("spotFullscreenClose").addEventListener("click", closeSpotFullscreen);
     document.addEventListener("fullscreenchange", updateSpotFullscreen);
-    E("q2NoticeButton").addEventListener("click", () => showNoticeConfirm("q2"));
+    E("q2NoticeButton").addEventListener("click", () => showNoticeConfirm("q3"));
     document.querySelectorAll("[data-move]").forEach(button => button.addEventListener("click", () => moveMaze(button.dataset.move)));
     E("mazeResetButton").addEventListener("click", resetMaze);
     E("q2AnswerButton").addEventListener("click", checkMazeAnswer);
     E("q2AnswerInput").addEventListener("keydown", event => { if (event.key === "Enter") checkMazeAnswer(); });
     E("q2AnswerInput").addEventListener("input", saveMaze);
-    E("q3NoticeButton").addEventListener("click", () => showNoticeConfirm("q3"));
+    E("q3NoticeButton").addEventListener("click", () => showNoticeConfirm("q1"));
     E("finalNoticeButton").addEventListener("click", () => showNoticeConfirm("last"));
     E("lastAnswerButton").addEventListener("click", checkLastAnswer);
     E("lastAnswerInput").addEventListener("keydown", event => { if (event.key === "Enter") checkLastAnswer(); });
@@ -91,23 +108,33 @@
     document.addEventListener("keydown", event => { if (event.key === "Escape") { closeModal(); closeViewer(); } });
     restoreMaze();
     restoreQ3();
-    updateQuestionNav();
+    showQuestion(0);
     initLast();
     loadClearConfig();
     loadNoticeConfig();
-    initAssistDebug();
     requestAnimationFrame(animateZodiac);
-    window.setInterval(decayCurtain, 100);
+    window.addEventListener("resize", alignSpotGridLines);
+  }
+
+  function alignSpotGridLines() {
+    const grids = document.querySelectorAll(".spot-difference-grid, .spot-code-grid");
+    grids.forEach(grid => grid.style.removeProperty("--snapped-grid-width"));
+    requestAnimationFrame(() => grids.forEach(grid => {
+      const available = Math.floor(grid.getBoundingClientRect().width);
+      if (available < 11) return;
+      const snapped = Math.floor((available - 6) / 5) * 5 + 6;
+      grid.style.setProperty("--snapped-grid-width", `${snapped}px`);
+    }));
   }
 
   function buildGrid() {
-    LETTERS.forEach((letter, index) => {
+    Array.from({ length: 18 }).forEach((_, index) => {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "letter-cell";
-      button.textContent = letter;
+      button.textContent = "";
       button.dataset.index = index;
-      button.setAttribute("aria-label", `${letter}のマス`);
+      button.setAttribute("aria-label", `${index + 1}番目のマス`);
       button.addEventListener("click", () => toggleCell(index));
       E("letterGrid").appendChild(button);
     });
@@ -121,63 +148,30 @@
 
   function renderGrid() {
     document.querySelectorAll(".letter-cell").forEach(button => {
-      const isSelected = selected.has(Number(button.dataset.index));
+      const index = Number(button.dataset.index);
+      if (q2Model) {
+        const side = q2Model.sideA;
+        button.textContent = side.letters[index] || "";
+        button.setAttribute("aria-label", `${side.letters[index] || ""}のマス`);
+      }
+      const isSelected = selected.has(index);
       button.classList.toggle("is-black", isSelected);
       button.setAttribute("aria-pressed", String(isSelected));
     });
   }
 
   function setupImages() {
-    RUNNERS.forEach(runner => {
-      const image = document.querySelector(`[data-runner="${runner.id}"]`);
-      image.src = `${assetRoot}${runner.file}`;
+    if (!q2Model) return;
+    const images = [...document.querySelectorAll("#imageLane [data-runner]")];
+    images.forEach(image => image.classList.remove("q2-runner"));
+    q2Model.sideA.runners.forEach((runner, index) => {
+      const image = document.querySelector(`[data-runner="${index}"]`);
+      image.src = `images/q2/runners/${runner.slug}.png`;
+      image.alt = runner.name;
+      image.style.setProperty("--runner-index", index);
     });
-  }
-
-  function startCycle() {
-    runCycle();
-    cycleTimer = window.setInterval(runCycle, CYCLE_MS);
-  }
-
-  function runCycle() {
-    RUNNERS.forEach(runner => {
-      const duration = getQ1RunnerDuration(runner);
-      const latestStart = Math.max(0, CYCLE_SECONDS - duration);
-      const delaySeconds = runner.id === "A" ? 0 : Math.random() * latestStart;
-      window.setTimeout(() => animateRunner(runner, duration), delaySeconds * 1000);
-    });
-  }
-
-  function animateRunner(runner, duration = runner.duration) {
-    const lane = E("imageLane");
-    const image = document.querySelector(`[data-runner="${runner.id}"]`);
-    const imageWidth = image.getBoundingClientRect().width || 72;
-    image.getAnimations().forEach(animation => animation.cancel());
-    image.animate(
-      [
-        { transform: `translateX(${lane.clientWidth + imageWidth}px)`, opacity: 1 },
-        { transform: `translateX(${-imageWidth}px)`, opacity: 1 }
-      ],
-      { duration: duration * 1000, easing: "linear", fill: "none" }
-    );
-  }
-
-  function getQ1RunnerDuration(runner) {
-    if (runner.id === "A") return runner.duration;
-    const level = getQ1AssistLevel();
-    return Math.min(CYCLE_SECONDS * 0.9, runner.duration * (1 + level * 0.15));
-  }
-
-  function getQ1AssistLevel() {
-    if (Number.isInteger(q1AssistLevelFrozen)) return q1AssistLevelFrozen;
-    const elapsed = Math.max(0, Date.now() - q1StartedAt);
-    const stepMs = getAssistStepMs();
-    return Math.min(3, Math.max(0, Math.floor((elapsed - stepMs) / stepMs) + 1));
-  }
-
-  function getAssistStepMs() {
-    const panel = E("assistDebugPanel");
-    return lastConfig.assistDebugEnabled !== false && panel && !panel.hidden ? 60000 : 5 * 60000;
+    void E("imageLane").offsetWidth;
+    images.forEach(image => image.classList.add("q2-runner"));
   }
 
   async function openLaneFullscreen() {
@@ -232,25 +226,27 @@
 
   function checkAnswer() {
     const answer = normalize(E("answerInput").value);
-    if (!["hit", "ひっと"].includes(answer)) {
+    if (!q2Model?.aliases.includes(answer)) {
       E("wrongMessage").textContent = "どうやら違うようだ。";
       return;
     }
+    const previousOutcomeKey = getLinkedOutcomeKey();
     E("wrongMessage").textContent = "";
-    setSubmittedAnswer("q1SubmittedAnswer", E("answerInput").value);
-    q1AssistLevelFrozen = getQ1AssistLevel();
+    E("answerInput").value = q2Model.answer;
+    q2SolvedAnswer = q2Model.answer;
+    const answerChanged = resetQ3WhenOutcomeChanges(previousOutcomeKey);
+    setSubmittedAnswer("q1SubmittedAnswer", q2Model.answer);
     q1Solved = true;
-    saveAssistTimers();
     save(true);
     updateQuestionNav();
-    openModal('<h2 id="modalTitle">正解！</h2><p>Q1を解き明かした！</p><div class="modalactions"><button id="goQ2" type="button">Q2へ</button></div>');
-    E("goQ2").addEventListener("click", () => { closeModal(); showQuestion(1); });
+    openModal(`<h2 id="modalTitle">正解！</h2><p>答えは「${q2Model.answer}」</p><p>Q2を解き明かした！</p>${answerChanged ? "<p>Q3の答えが変わったようだ！</p>" : ""}<div class="modalactions"><button id="goQ2" type="button">Q3へ</button></div>`, answerChanged ? () => showQuestion(2) : null);
+    E("goQ2").addEventListener("click", () => { closeModal(); if (!answerChanged) showQuestion(2); });
   }
 
   function normalize(value) {
     return String(value || "").trim().toLowerCase()
       .replace(/[Ａ-Ｚａ-ｚ０-９]/g, char => String.fromCharCode(char.charCodeAt(0) - 0xFEE0))
-      .replace(/[ァ-ン]/g, char => String.fromCharCode(char.charCodeAt(0) - 0x60))
+      .replace(/[ァ-ヶ]/g, char => String.fromCharCode(char.charCodeAt(0) - 0x60))
       .replace(/\s+/g, "");
   }
 
@@ -268,20 +264,24 @@
 
   function showNotice(question, index = 0) {
     const fallbacks = {
-      q1: [{ type: "text", content: "まずは二人で、お互いの画面に流れる絵について話してみよう。" }],
-      q2: [{ type: "text", content: "自分の迷路は相手の画面にあります。相手の案内を聞いて、上下左右のボタンを押そう。" }],
-      q3: [{ type: "text", content: "指定された動物が、それぞれ何匹いるか数えてみよう。" }],
+      q1: [{ type: "text", content: "指定された動物が、それぞれ何匹いるか数えてみよう。" }],
+      q2: [{ type: "text", content: "二人の画面に流れる絵が示すひらがなのマスを黒くしよう。" }],
+      q3: [{ type: "text", content: "自分の迷路は相手の画面にあります。相手の案内を聞いて、上下左右のボタンを押そう。" }],
       last: [{ type: "text", content: "お互いの絵を教えあって、違うところを確かめよう。" }]
     };
     const notices = [...(noticeConfig.sideA?.[question] || fallbacks[question] || [])];
-    if (question === "last" && q3Answer) {
-      notices.forEach((notice, noticeIndex) => {
-        if (notice.type === "text") notices[noticeIndex] = { ...notice, content: notice.content.split("{{Q3_ANSWER}}").join(q3Answer) };
-      });
-    }
-    if (question === "q3") {
-      const currentAnswer = lastModel?.[pageSide]?.answer || lastModel?.sideA?.answer;
-      if (currentAnswer) notices.push({ type: "text", content: `現在のQ3の答えは「${currentAnswer}」` });
+    const outcome = getLinkedOutcome();
+    notices.forEach((notice, noticeIndex) => {
+      if (notice.type !== "text") return;
+      notices[noticeIndex] = { ...notice, content: notice.content
+        .split("{{Q1_ANSWER}}").join(q3Answer || "？")
+        .split("{{Q2_ANSWER}}").join(q2SolvedAnswer || "？")
+        .split("{{Q3_ANSWER}}").join(outcome?.q3Answer || "？")
+        .split("{{LAST_ANSWER}}").join(outcome?.finalAnswer || "？") };
+    });
+    if (question === "q1") {
+      const currentAnswer = lastModel?.[`stage${q1RoundStage + 1}`]?.answer;
+      if (currentAnswer) notices.push({ type: "text", content: `現在のQ1の答えは「${currentAnswer}」` });
     }
     if (question === "last" && finalAnswer) {
       notices.push({ type: "text", content: `現在のLASTの答えは「${finalAnswer}」` });
@@ -301,14 +301,26 @@
     E("noticeNext")?.addEventListener("click", () => showNotice(question, safeIndex + 1));
   }
 
-  function openViewer(source) {
+  async function openViewer(source) {
     if (!source) return;
+    const viewer = E("viewer");
     E("viewerImage").src = source.src;
     E("viewerImage").alt = source.alt;
-    E("viewer").classList.remove("hidden");
+    viewer.classList.remove("hidden");
+    viewer.classList.add("is-mobile-expanded");
+    try {
+      if (viewer.requestFullscreen) await viewer.requestFullscreen();
+      if (screen.orientation?.lock) await screen.orientation.lock("landscape");
+    } catch (_) { /* iPhone SafariではCSSによる横向き拡大を使用する */ }
   }
 
-  function closeViewer() { E("viewer").classList.add("hidden"); }
+  async function closeViewer() {
+    if (document.fullscreenElement === E("viewer") && document.exitFullscreen) {
+      try { await document.exitFullscreen(); } catch (_) { /* 通常表示へ戻す処理は継続する */ }
+    }
+    E("viewer").classList.remove("is-mobile-expanded");
+    E("viewer").classList.add("hidden");
+  }
 
   function showResetConfirm() {
     openModal('<h2 id="modalTitle">進捗リセット</h2><p>すべての問題の進捗と回答を最初の状態に戻しますか？</p><div class="modalactions"><button id="doReset" type="button">すべてリセットする</button><button id="cancelReset" type="button">キャンセル</button></div>');
@@ -322,8 +334,12 @@
     q2Solved = false;
     q3Solved = false;
     q3Answer = "";
+    q2SolvedAnswer = "";
+    q1RoundStage = 0;
+    restoredQ1Progress = null;
     finalAnswer = "";
     finalCardNumbers = null;
+    E("finalLengthHint").textContent = "";
     currentQuestion = 0;
     mazePosition = [0, 0];
     routeText = "";
@@ -340,12 +356,6 @@
     localStorage.removeItem(storageKey);
     localStorage.removeItem(mazeStorageKey);
     localStorage.removeItem(q3StorageKey);
-    localStorage.removeItem(assistStorageKey);
-    q1StartedAt = Date.now();
-    q3StartedAt = 0;
-    q1AssistLevelFrozen = null;
-    q3AssistLevelFrozen = null;
-    saveAssistTimers();
     renderGrid();
     renderMazeState();
     showQuestion(0);
@@ -353,41 +363,43 @@
   }
 
   function save(solved = q1Solved) {
-    localStorage.setItem(storageKey, JSON.stringify({ selected: [...selected], answer: E("answerInput")?.value || "", solved }));
+    localStorage.setItem(storageKey, JSON.stringify({ selected: [...selected], answer: solved ? q2SolvedAnswer : (E("answerInput")?.value || ""), solved, roundKey: q2RoundKey }));
   }
 
   function restore() {
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey));
       if (!saved) return;
-      selected = new Set(saved.selected || []);
-      q1Solved = Boolean(saved.solved);
-      E("answerInput").value = saved.answer || "";
-      if (q1Solved) setSubmittedAnswer("q1SubmittedAnswer", saved.answer || "");
-      renderGrid();
+      restoredQ2Progress = saved;
+      const isCurrentAnswer = window.Team1Last?.q2Answers?.some(item => item.answer === saved.answer);
+      q1Solved = Boolean(saved.solved && isCurrentAnswer);
+      q2SolvedAnswer = q1Solved ? (saved.answer || "") : "";
+      E("answerInput").value = q1Solved ? saved.answer : "";
+      if (q1Solved) setSubmittedAnswer("q1SubmittedAnswer", saved.answer);
     } catch { /* Ignore invalid saved data. */ }
   }
 
-  function openModal(content) {
+  function openModal(content, onClose = null) {
+    modalCloseAction = onClose;
     E("modalContent").innerHTML = content;
     E("modal").classList.remove("hidden");
   }
 
-  function closeModal() { E("modal").classList.add("hidden"); }
+  function closeModal() {
+    E("modal").classList.add("hidden");
+    const action = modalCloseAction;
+    modalCloseAction = null;
+    action?.();
+  }
 
   function showQuestion(index) {
-    if (index < 0 || index > 3 || (index === 1 && !q1Solved) || (index === 2 && !q2Solved) || (index === 3 && !q3Solved)) return;
+    if (index < 0 || index > 3 || (index === 1 && !q3Solved) || (index === 2 && !q1Solved) || (index === 3 && !q2Solved)) return;
     currentQuestion = index;
-    if (index === 2 && !q3StartedAt) {
-      q3StartedAt = Date.now();
-      saveAssistTimers();
-    }
-    E("question1").classList.toggle("hidden", index !== 0);
-    E("q1AnswerCard").classList.toggle("hidden", index !== 0);
-    E("question2").classList.toggle("hidden", index !== 1);
-    E("q2AnswerCard").classList.toggle("hidden", index !== 1);
-    E("questionLast").classList.toggle("hidden", index !== 2);
-    E("lastAnswerCard").classList.toggle("hidden", index !== 2);
+    E("questionLast").classList.toggle("hidden", index !== 0);
+    E("question1").classList.toggle("hidden", index !== 1);
+    E("q1AnswerCard").classList.toggle("hidden", index !== 1);
+    E("question2").classList.toggle("hidden", index !== 2);
+    E("q2AnswerCard").classList.toggle("hidden", index !== 2);
     E("questionFinal").classList.toggle("hidden", index !== 3);
     E("finalAnswerCard").classList.toggle("hidden", index !== 3);
     updateQuestionNav();
@@ -396,12 +408,12 @@
 
   function updateQuestionNav() {
     const steps = [...document.querySelectorAll("[data-question]")];
-    steps[1].disabled = !q1Solved;
-    steps[2].disabled = !q2Solved;
-    steps[3].disabled = !q3Solved;
+    steps[1].disabled = !q3Solved;
+    steps[2].disabled = !q1Solved;
+    steps[3].disabled = !q2Solved;
     steps.forEach((button, index) => button.classList.toggle("current", index === currentQuestion));
     E("prevQuestionButton").disabled = currentQuestion === 0;
-    E("nextQuestionButton").disabled = currentQuestion === 3 || (currentQuestion === 0 && !q1Solved) || (currentQuestion === 1 && !q2Solved) || (currentQuestion === 2 && !q3Solved);
+    E("nextQuestionButton").disabled = currentQuestion === 3 || (currentQuestion === 0 && !q3Solved) || (currentQuestion === 1 && !q1Solved) || (currentQuestion === 2 && !q2Solved);
   }
 
   function edgeKey(from, to) {
@@ -416,7 +428,7 @@
     if (next[0] < 0 || next[0] > 4 || next[1] < 0 || next[1] > 4) return;
     if (BLOCKED.has(edgeKey(mazePosition, next))) return;
     mazePosition = next;
-    routeText += MAZE_LETTERS[`${next[0]},${next[1]}`] || "";
+    routeText += getMazeLetters()[`${next[0]},${next[1]}`] || "";
     renderMazeState();
     saveMaze();
   }
@@ -427,17 +439,19 @@
   }
 
   function checkMazeAnswer() {
-    if (normalize(E("q2AnswerInput").value) !== "はたらく") {
+    const outcome = getLinkedOutcome();
+    if (!outcome || normalize(E("q2AnswerInput").value) !== outcome.q3Answer) {
       E("q2WrongMessage").textContent = "どうやらまちがっているようだ。";
       return;
     }
     E("q2WrongMessage").textContent = "";
     setSubmittedAnswer("q2SubmittedAnswer", E("q2AnswerInput").value);
     q2Solved = true;
+    renderNegiFinalCards();
     saveMaze();
     updateQuestionNav();
-    openModal('<h2 id="modalTitle">正解！</h2><p>Q2を解き明かした！</p><div class="modalactions"><button id="goLast" type="button">Q3へ</button></div>');
-    E("goLast").addEventListener("click", () => { closeModal(); showQuestion(2); });
+    openModal(`<h2 id="modalTitle">正解！</h2><p>答えは「${outcome.q3Answer}」</p><p>Q3を解き明かした！</p><div class="modalactions"><button id="goLast" type="button">LASTへ</button></div>`);
+    E("goLast").addEventListener("click", () => { closeModal(); showQuestion(3); });
   }
 
   function resetMaze() {
@@ -449,7 +463,7 @@
   }
 
   function saveMaze() {
-    localStorage.setItem(mazeStorageKey, JSON.stringify({ position: mazePosition, routeText, answer: E("q2AnswerInput")?.value || "", solved: q2Solved }));
+    localStorage.setItem(mazeStorageKey, JSON.stringify({ position: mazePosition, routeText, answer: E("q2AnswerInput")?.value || "", solved: q2Solved, outcomeKey: getLinkedOutcomeKey() }));
   }
 
   function restoreMaze() {
@@ -470,84 +484,39 @@
     localStorage.setItem(q3StorageKey, JSON.stringify({
       solved: q3Solved,
       answer: q3Answer,
-      submittedAnswer: E("lastAnswerInput")?.value || "",
-      cardNumbers: finalCardNumbers
+      submittedAnswer: q3Solved && q3Answer ? q3Answer : (E("lastAnswerInput")?.value || ""),
+      cardNumbers: finalCardNumbers,
+      outcomeKey: getLinkedOutcomeKey(),
+      roundKey: lastRoundKey,
+      stage: q1RoundStage
     }));
-  }
-
-  function saveAssistTimers() {
-    localStorage.setItem(assistStorageKey, JSON.stringify({ q1StartedAt, q3StartedAt, q1AssistLevelFrozen, q3AssistLevelFrozen }));
-  }
-
-  function restoreAssistTimers() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(assistStorageKey));
-      q1StartedAt = Number.isFinite(saved?.q1StartedAt) ? saved.q1StartedAt : Date.now();
-      q3StartedAt = Number.isFinite(saved?.q3StartedAt) ? saved.q3StartedAt : 0;
-      q1AssistLevelFrozen = Number.isInteger(saved?.q1AssistLevelFrozen) ? saved.q1AssistLevelFrozen : null;
-      q3AssistLevelFrozen = Number.isInteger(saved?.q3AssistLevelFrozen) ? saved.q3AssistLevelFrozen : null;
-      if (q1Solved && !Number.isInteger(q1AssistLevelFrozen)) q1AssistLevelFrozen = getQ1AssistLevel();
-    } catch (_) {
-      q1StartedAt = Date.now();
-      q3StartedAt = 0;
-      q1AssistLevelFrozen = null;
-      q3AssistLevelFrozen = null;
-    }
-    saveAssistTimers();
-  }
-
-  function getQ3Ease() {
-    const level = getQ3AssistLevel();
-    return Math.max(0.1, 1 - level * 0.15);
-  }
-
-  function getQ3AssistLevel() {
-    if (Number.isInteger(q3AssistLevelFrozen)) return q3AssistLevelFrozen;
-    if (!q3StartedAt) return 0;
-    return Math.min(6, Math.floor(Math.max(0, Date.now() - q3StartedAt) / getAssistStepMs()));
-  }
-
-  function initAssistDebug() {
-    if (sessionStorage.getItem(`${assistStorageKey}_debug_hidden`) === "1") return;
-    const panel = document.createElement("aside");
-    panel.id = "assistDebugPanel";
-    panel.className = "assist-debug-panel";
-    panel.innerHTML = '<button type="button" aria-label="テスト表示を閉じる">×</button><strong>難易度調整テスト</strong><div></div>';
-    panel.querySelector("button").addEventListener("click", () => {
-      sessionStorage.setItem(`${assistStorageKey}_debug_hidden`, "1");
-      panel.remove();
-    });
-    document.body.appendChild(panel);
-    updateAssistDebug();
-    window.setInterval(updateAssistDebug, 1000);
-  }
-
-  function updateAssistDebug() {
-    const panel = E("assistDebugPanel");
-    if (!panel) return;
-    panel.hidden = lastConfig.assistDebugEnabled === false;
-    if (panel.hidden) return;
-    const formatElapsed = startedAt => {
-      if (!startedAt) return "未開始";
-      const seconds = Math.floor(Math.max(0, Date.now() - startedAt) / 1000);
-      return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
-    };
-    const q1Percent = `${getQ1AssistLevel() * 15}%減速${q1Solved ? "（固定）" : ""}`;
-    const q3Percent = `${Math.round((1 - getQ3Ease()) * 100)}%緩和${q3Solved ? "（固定）" : ""}`;
-    panel.querySelector("div").innerHTML = `判定間隔：1分（テスト）<br>Q1 ${formatElapsed(q1StartedAt)}／${q1Percent}<br>Q3 ${formatElapsed(q3StartedAt)}／${q3Percent}`;
   }
 
   function restoreQ3() {
     try {
       const saved = JSON.parse(localStorage.getItem(q3StorageKey));
-      if (!saved?.solved || !window.Team1Last?.answers?.includes(saved.answer)) return;
-      if (!Number.isInteger(q3AssistLevelFrozen)) q3AssistLevelFrozen = getQ3AssistLevel();
+      if (!saved) return;
+      if (!saved.solved) {
+        restoredQ1Progress = saved;
+        return;
+      }
+      if (!window.Team1Last?.q1Marks?.some(mark => mark.answer === saved.answer)) return;
       q3Solved = true;
-      saveAssistTimers();
+      q1RoundStage = 2;
       q3Answer = saved.answer;
-      E("lastAnswerInput").value = saved.submittedAnswer || saved.answer;
-      setSubmittedAnswer("lastSubmittedAnswer", saved.submittedAnswer || saved.answer);
-      renderNegiFinalCards(saved.cardNumbers);
+      E("lastAnswerInput").value = saved.answer;
+      setSubmittedAnswer("lastSubmittedAnswer", saved.answer);
+      const outcome = getLinkedOutcome();
+      if (q2Solved && outcome && normalize(E("q2AnswerInput").value) !== outcome.q3Answer) {
+        q2Solved = false;
+        mazePosition = [0, 0];
+        routeText = "";
+        E("q2AnswerInput").value = "";
+        setSubmittedAnswer("q2SubmittedAnswer", "");
+        renderMazeState();
+        saveMaze();
+      }
+      renderNegiFinalCards(saved.outcomeKey === getLinkedOutcomeKey() ? saved.cardNumbers : null);
     } catch (_) {
       localStorage.removeItem(q3StorageKey);
     }
@@ -583,78 +552,105 @@
     E("roundProgress").value = remaining;
     const shown = Math.max(0, Math.ceil(remaining));
     E("roundTimeText").textContent = `残り ${Math.floor(shown / 60)}:${String(shown % 60).padStart(2, "0")}`;
+    const q2Duration = 120;
+    const currentQ2RoundKey = Math.floor(nowSeconds / q2Duration);
+    const q2Remaining = q2Duration - (nowSeconds - currentQ2RoundKey * q2Duration);
+    const q2Shown = Math.max(0, Math.ceil(q2Remaining));
+    E("q2RoundProgress").max = q2Duration;
+    E("q2RoundProgress").value = q2Remaining;
+    E("q2RoundTimeText").textContent = `残り ${Math.floor(q2Shown / 60)}:${String(q2Shown % 60).padStart(2, "0")}`;
+    updateQ2Round(currentQ2RoundKey);
     if (roundKey === lastRoundKey) return;
     lastRoundKey = roundKey;
-    lastModel = window.Team1Last.create(roundKey);
+    lastModel = window.Team1Last.createQ1(roundKey);
+    if (!q3Solved) {
+      q1RoundStage = restoredQ1Progress?.roundKey === roundKey
+        ? Math.max(0, Math.min(2, Number(restoredQ1Progress.stage) || 0))
+        : 0;
+      restoredQ1Progress = null;
+      E("lastAnswerInput").value = "";
+      E("lastWrongMessage").textContent = "";
+      E("lastWrongMessage").classList.remove("is-correct");
+      saveQ3();
+    } else {
+      // A new timed round always starts from stage 1, while the Q1 clear state remains unlocked.
+      q1RoundStage = 0;
+      E("lastAnswerInput").value = "";
+      E("lastWrongMessage").textContent = "";
+      E("lastWrongMessage").classList.remove("is-correct");
+    }
     renderLastRound();
   }
 
+  function updateQ2Round(roundKey) {
+    if (roundKey === q2RoundKey) return;
+    q2RoundKey = roundKey;
+    q2Model = window.Team1Last.createQ2(roundKey);
+    selected = restoredQ2Progress?.roundKey === roundKey
+      ? new Set(restoredQ2Progress.selected || [])
+      : new Set();
+    restoredQ2Progress = null;
+    E("answerInput").value = "";
+    E("wrongMessage").textContent = "";
+    renderGrid();
+    setupImages();
+    if (!q1Solved) save(false);
+  }
+
   function renderLastRound() {
-    const side = lastModel[pageSide] || lastModel.sideA;
+    if (!lastModel) return;
+    const challenge = lastModel[`stage${q1RoundStage + 1}`];
+    const items = challenge.sideA;
     const stage = E("zodiacStage");
-    stage.innerHTML = "";
+    stage.querySelectorAll(".q1-moving-sprite").forEach(element => element.remove());
     lastSprites = [];
-    const random = window.Team1Last.randomFrom(side.motionSeed);
-    const sizeLevels = [36, 44, 52, 60, 68];
-    const balancedSizes = side.tokens.map((_, index) => sizeLevels[index % sizeLevels.length]);
-    const ease = getQ3Ease();
-    const speedLevels = [0.024, 0.042, 0.060, 0.078, 0.096].map(speed => 0.06 + (speed - 0.06) * ease);
-    const balancedSpeeds = side.tokens.map((_, index) => speedLevels[index % speedLevels.length]);
+    E("q1StagePrompt").textContent = challenge.prompt;
+    E("q1StageStatus").textContent = `${q1RoundStage + 1} / 3`;
+    const random = window.Team1Last.randomFrom(challenge.motionSeed.sideA);
+    const baseSizeLevels = [108, 132, 156, 180, 204];
+    const sizeLevels = window.matchMedia("(max-width: 700px)").matches
+      ? baseSizeLevels.map(size => size / 2)
+      : baseSizeLevels;
+    const balancedSizes = items.map((_, index) => sizeLevels[index % sizeLevels.length]);
     for (let i = balancedSizes.length - 1; i > 0; i--) {
       const j = Math.floor(random() * (i + 1));
       [balancedSizes[i], balancedSizes[j]] = [balancedSizes[j], balancedSizes[i]];
     }
-    for (let i = balancedSpeeds.length - 1; i > 0; i--) {
-      const j = Math.floor(random() * (i + 1));
-      [balancedSpeeds[i], balancedSpeeds[j]] = [balancedSpeeds[j], balancedSpeeds[i]];
-    }
-    side.tokens.forEach((animalIndex, index) => {
-      const image = document.createElement("img");
-      image.src = `images/zodiac/${lastModel.animals[animalIndex]}.png`;
-      image.alt = lastModel.animalNames[animalIndex];
-      image.className = "zodiac-sprite";
+    items.forEach((item, index) => {
+      const isImage = q1RoundStage === 0 || Boolean(item?.file);
+      const element = isImage ? document.createElement("img") : document.createElement("span");
+      if (q1RoundStage === 0) {
+        element.src = `images/zodiac/${window.Team1Last.animals[item]}.png`;
+        element.alt = window.Team1Last.animalNames[item];
+      } else if (item?.file) {
+        element.src = `images/q1/homophones/${item.file}`;
+        element.alt = item.alt;
+      } else {
+        element.textContent = q1RoundStage === 1 ? item.icon : item;
+        element.setAttribute("aria-label", q1RoundStage === 1 ? item.alt : `${item}の記号`);
+      }
+      element.className = `q1-moving-sprite ${isImage ? "zodiac-sprite" : "q1-emoji-sprite"}`;
       const angle = random() * Math.PI * 2;
-      const speed = balancedSpeeds[index];
+      const speed = 0.0825;
       const sprite = {
-        element: image,
+        element,
         x: random(), y: random(),
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
         size: balancedSizes[index],
         sizePhase: random() * Math.PI * 2,
         sizePeriod: 0.8 + random() * 1.8,
-        sizeMin: 1 + ((0.72 + random() * 0.16) - 1) * ease,
-        sizeMax: 1 + ((1.12 + random() * 0.28) - 1) * ease,
+        sizeMin: 0.78 + random() * 0.1,
+        sizeMax: 1.12 + random() * 0.2,
         index
       };
-      image.style.width = `${sprite.size}px`;
-      image.style.zIndex = String(1 + Math.floor(random() * 20));
-      stage.appendChild(image);
+      element.style.width = `${sprite.size}px`;
+      element.style.height = `${sprite.size}px`;
+      element.style.fontSize = `${Math.round(sprite.size * 0.78)}px`;
+      element.style.zIndex = String(2 + Math.floor(random() * 20));
+      stage.appendChild(element);
       lastSprites.push(sprite);
     });
-
-    curtainReveal = 0;
-    if (lastConfig.blackCurtainEnabled !== false) {
-      const curtain = document.createElement("button");
-      curtain.id = "zodiacCurtain";
-      curtain.className = "zodiac-curtain";
-      curtain.type = "button";
-      curtain.textContent = "100";
-      curtain.setAttribute("aria-label", "押して黒い覆いの透過度を下げる");
-      curtain.addEventListener("click", revealCurtain);
-      stage.appendChild(curtain);
-      renderCurtain();
-    }
-
-    E("lastTargets").innerHTML = "";
-    side.targetAnimalIndexes.forEach((animalIndex, index) => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "last-target";
-      wrapper.innerHTML = `<span>${side.targetPositions?.[index] || index + 1}</span><img src="images/zodiac/${lastModel.animals[animalIndex]}.png" alt="${lastModel.animalNames[animalIndex]}">`;
-      E("lastTargets").appendChild(wrapper);
-    });
-    E("lastAnswerInput").value = "";
-    E("lastWrongMessage").textContent = "";
   }
 
   function animateZodiac(now) {
@@ -663,113 +659,92 @@
     const stage = E("zodiacStage");
     const width = stage?.clientWidth || 1;
     const height = stage?.clientHeight || 1;
-    const duration = Math.max(10, Number(lastConfig.roundDurationSeconds) || 60);
-    const roundElapsed = lastRoundKey === null
-      ? 0
-      : (Date.now() + clockOffsetMs) / 1000 - lastRoundKey * duration;
-    const configuredPulseStart = Number(lastConfig.sizePulseStartSeconds);
-    const pulseStart = Number.isFinite(configuredPulseStart) ? configuredPulseStart : 0;
-    const pulseElapsed = Math.max(0, roundElapsed - pulseStart);
-    const pulseBlend = Math.min(1, pulseElapsed);
-    const speedUpStart = Number(lastConfig.speedUpStartSeconds) || 30;
-    const ease = getQ3Ease();
-    const configuredSpeedMultiplier = Math.max(1, Number(lastConfig.speedMultiplier) || 1.5);
-    const speedMultiplier = roundElapsed >= speedUpStart
-      ? 1 + (configuredSpeedMultiplier - 1) * ease
-      : 1;
+    const elapsed = performance.now() / 1000;
     lastSprites.forEach(sprite => {
-      sprite.x += sprite.vx * delta * speedMultiplier;
-      sprite.y += sprite.vy * delta * speedMultiplier;
+      sprite.x += sprite.vx * delta;
+      sprite.y += sprite.vy * delta;
       if (sprite.x < 0) { sprite.x = 0; sprite.vx = Math.abs(sprite.vx); }
       if (sprite.x > 1) { sprite.x = 1; sprite.vx = -Math.abs(sprite.vx); }
       if (sprite.y < 0) { sprite.y = 0; sprite.vy = Math.abs(sprite.vy); }
       if (sprite.y > 1) { sprite.y = 1; sprite.vy = -Math.abs(sprite.vy); }
       const drawX = Math.round(sprite.x * Math.max(0, width - sprite.size));
       const drawY = Math.round(sprite.y * Math.max(0, height - sprite.size));
-      const wave = 0.5 + 0.5 * Math.sin(sprite.sizePhase + pulseElapsed * Math.PI * 2 / sprite.sizePeriod);
+      const wave = 0.5 + 0.5 * Math.sin(sprite.sizePhase + elapsed * Math.PI * 2 / sprite.sizePeriod);
       const targetScale = sprite.sizeMin + (sprite.sizeMax - sprite.sizeMin) * wave;
-      const scale = pulseElapsed > 0 ? 1 + (targetScale - 1) * pulseBlend : 1;
-      sprite.element.style.transform = `translate3d(${drawX}px, ${drawY}px, 0) scale(${scale.toFixed(3)})`;
+      sprite.element.style.transform = `translate3d(${drawX}px, ${drawY}px, 0) scale(${targetScale.toFixed(3)})`;
     });
     requestAnimationFrame(animateZodiac);
   }
 
-  function revealCurtain() {
-    curtainReveal = Math.min(1, curtainReveal + 0.03);
-    lastCurtainClick = performance.now();
-    renderCurtain();
-  }
-
-  function decayCurtain() {
-    if (curtainReveal <= 0 || performance.now() - lastCurtainClick < 100) return;
-    curtainReveal = Math.max(0, curtainReveal - 0.02);
-    renderCurtain();
-  }
-
-  function renderCurtain() {
-    const curtain = E("zodiacCurtain");
-    if (!curtain) return;
-    const opacity = Math.max(0, Math.min(1, 1 - curtainReveal));
-    curtain.style.backgroundColor = `rgba(0, 0, 0, ${opacity})`;
-    curtain.textContent = String(Math.round(opacity * 100));
-  }
-
   function checkLastAnswer() {
-    const side = lastModel?.[pageSide] || lastModel?.sideA;
-    const submittedAnswer = normalize(E("lastAnswerInput").value);
-    if (!side || submittedAnswer !== side.answer) {
-      const isAnswerFromAnotherTime = window.Team1Last?.answers?.some(answer => normalize(answer) === submittedAnswer);
-      E("lastWrongMessage").textContent = isAnswerFromAnotherTime
-        ? "その答えはもう正解ではないようだ。"
-        : "どうやら違うようだ。";
+    updateLastRound();
+    const rawAnswer = String(E("lastAnswerInput").value || "").trim();
+    const submittedAnswer = normalize(rawAnswer);
+    const challenge = lastModel?.[`stage${q1RoundStage + 1}`];
+    E("lastWrongMessage").classList.remove("is-correct");
+    if (!/^[ぁ-ゖァ-ヶー]+$/.test(rawAnswer)) {
+      E("lastWrongMessage").textContent = "ひらがなで入力してください。";
+      E("lastAnswerInput").value = "";
+      E("lastAnswerInput").focus();
+      return;
+    }
+    if (!challenge?.aliases.includes(submittedAnswer)) {
+      E("lastWrongMessage").textContent = "どうやら違うようだ。";
+      E("lastAnswerInput").value = "";
+      E("lastAnswerInput").focus();
+      return;
+    }
+    if (q1RoundStage < 2) {
+      q1RoundStage += 1;
+      E("lastAnswerInput").value = "";
+      E("lastWrongMessage").classList.add("is-correct");
+      E("lastWrongMessage").textContent = `正解！ 第${q1RoundStage + 1}問へ`;
+      saveQ3();
+      renderLastRound();
+      E("lastAnswerInput").focus();
       return;
     }
     E("lastWrongMessage").textContent = "";
-    setSubmittedAnswer("lastSubmittedAnswer", E("lastAnswerInput").value);
-    q3AssistLevelFrozen = getQ3AssistLevel();
+    E("lastWrongMessage").classList.remove("is-correct");
+    setSubmittedAnswer("lastSubmittedAnswer", challenge.answer);
     q3Solved = true;
-    saveAssistTimers();
-    q3Answer = side.answer;
-    renderNegiFinalCards();
+    const previousOutcomeKey = getLinkedOutcomeKey();
+    q3Answer = challenge.answer;
+    const answerChanged = resetQ3WhenOutcomeChanges(previousOutcomeKey);
     saveQ3();
     updateQuestionNav();
-    openModal('<h2 id="modalTitle">正解！</h2><p>Q3を解き明かした！</p><div class="modalactions"><button id="goFinal" type="button">LASTへ</button></div>');
-    E("goFinal").addEventListener("click", () => { closeModal(); showQuestion(3); });
+    openModal(`<h2 id="modalTitle">正解！</h2><p>答えは「${challenge.answer}」</p><p>Q1を解き明かした！</p>${answerChanged ? "<p>Q3の答えが変わったようだ！</p>" : ""}<div class="modalactions"><button id="goFinal" type="button">${answerChanged ? "Q3へ" : "Q2へ"}</button></div>`, answerChanged ? () => showQuestion(2) : null);
+    E("goFinal").addEventListener("click", () => { closeModal(); if (!answerChanged) showQuestion(1); });
   }
 
   function renderNegiFinalCards(savedCardNumbers = null) {
-    const characters = [...q3Answer];
-    const useOpenedAnswer = characters.includes("い");
-    const q3Character = useOpenedAnswer ? "い" : "く";
-    const q3Position = characters.indexOf(q3Character) + 1;
-    finalAnswer = useOpenedAnswer ? "ひらいた" : "ひらく";
-
-    const fixedNumbers = new Map([
-      ["A1", 1],
-      ["B3", 2],
-      [`C${q3Position}`, 3]
-    ]);
-    if (useOpenedAnswer) fixedNumbers.set("B2", 4);
+    const outcome = getLinkedOutcome();
+    if (!outcome) return;
+    finalAnswer = outcome.finalAnswer;
+    E("finalLengthHint").textContent = `答えは${[...finalAnswer].length}文字`;
+    const rowForSource = { q2: "A", q3: "B", q1: "C" };
+    const fixedNumbers = new Map(outcome.selected.map(item => [`${rowForSource[item.source]}${item.position}`, item.number]));
 
     const random = window.Team1Last.randomFrom(window.Team1Last.hash(`team1:final-cards:${q3Answer}:${Date.now()}:${performance.now()}`));
     const grid = E("negiSpotGrid");
     grid.innerHTML = "";
-    const coordinates = ["A", "B", "C"].flatMap(rowName => [1, 2, 3, 4].map(column => `${rowName}${column}`));
-    const useSavedNumbers = savedCardNumbers && coordinates.every(coordinate => [1, 2, 3, 4].includes(savedCardNumbers[coordinate]));
+    const coordinates = ["A", "B", "C"].flatMap(rowName => [1, 2, 3, 4, 5].map(column => `${rowName}${column}`));
+    const numberRange = Array.from({ length: Math.max(5, [...finalAnswer].length) }, (_, index) => index + 1);
+    const useSavedNumbers = savedCardNumbers && coordinates.every(coordinate => numberRange.includes(savedCardNumbers[coordinate]));
     finalCardNumbers = {};
     ["A", "B", "C"].forEach(rowName => {
       const fixedInRow = new Map();
-      for (let column = 1; column <= 4; column++) {
+      for (let column = 1; column <= 5; column++) {
         const coordinate = `${rowName}${column}`;
         if (fixedNumbers.has(coordinate)) fixedInRow.set(column, fixedNumbers.get(coordinate));
       }
-      const availableNumbers = [1, 2, 3, 4].filter(number => ![...fixedInRow.values()].includes(number));
+      const availableNumbers = numberRange.filter(number => ![...fixedInRow.values()].includes(number));
       for (let index = availableNumbers.length - 1; index > 0; index--) {
         const swapIndex = Math.floor(random() * (index + 1));
         [availableNumbers[index], availableNumbers[swapIndex]] = [availableNumbers[swapIndex], availableNumbers[index]];
       }
 
-      for (let column = 1; column <= 4; column++) {
+      for (let column = 1; column <= 5; column++) {
         const coordinate = `${rowName}${column}`;
         const number = useSavedNumbers ? savedCardNumbers[coordinate] : (fixedInRow.get(column) || availableNumbers.shift());
         finalCardNumbers[coordinate] = number;
@@ -789,6 +764,7 @@
     E("finalAnswerInput").value = "";
     E("finalWrongMessage").textContent = "";
     setSubmittedAnswer("finalSubmittedAnswer", "");
+    alignSpotGridLines();
   }
 
   function checkFinalAnswer() {

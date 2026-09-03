@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <link rel="icon" href="../../favicon.ico" sizes="any">
   <title>なぞねぎ側｜協力しないと出られない部屋からの脱出</title>
   <meta name="description" content="二人で別々の画面を見て、情報を共有しながら挑む協力型のブラウザ謎解きゲームです。">
@@ -25,22 +25,26 @@
       <a href="index.html">← タイトルに戻る</a>
       <span>TEAM 1 / SIDE A</span>
     </header>
-    <section id="question1" class="card q1-card game-question">
+    <section id="question1" class="card q1-card game-question hidden">
       <div class="question-header">
-        <h1 class="qlabel"><img class="question-number-image" src="images/sideA/q1-label.png" alt="Q1"></h1>
+        <h1 class="qlabel"><img class="question-number-image" src="images/sideA/q2-label.png" alt="Q2"></h1>
         <button id="noticeButton" class="notice-link" type="button">気づく</button>
       </div>
 
-      <p class="q1-instruction">絵をもじに反映して、
-      </p>
+      <p class="q1-instruction">マスよめ</p>
 
       <div id="letterGrid" class="letter-grid" aria-label="ひらがなのマス"></div>
 
+      <div class="round-timer q2-round-timer">
+        <progress id="q2RoundProgress" max="120" value="120"></progress>
+        <span id="q2RoundTimeText">残り 2:00</span>
+      </div>
+
       <div id="imageLane" class="image-lane" aria-label="右から左へ流れる4つの画像">
-        <img data-runner="A" alt="たぬき">
-        <img data-runner="B" alt="ないと">
-        <img data-runner="C" alt="ドレス">
-        <img data-runner="D" alt="ナイフ">
+        <img data-runner="0" alt="">
+        <img data-runner="1" alt="">
+        <img data-runner="2" alt="">
+        <img data-runner="3" alt="">
         <button id="laneFullscreenClose" class="lane-fullscreen-close" type="button" aria-label="拡大表示を閉じる">×</button>
       </div>
       <button id="laneFullscreenButton" class="lane-fullscreen-button" type="button">拡大</button>
@@ -49,7 +53,7 @@
 
     <section id="question2" class="card q2-card game-question hidden">
       <div class="question-header">
-        <h1 class="qlabel"><img class="question-number-image" src="images/sideA/q2-label.png" alt="Q2"></h1>
+        <h1 class="qlabel"><img class="question-number-image" src="images/sideA/q3-label.png" alt="Q3"></h1>
         <button id="q2NoticeButton" class="notice-link" type="button">気づく</button>
       </div>
 
@@ -87,35 +91,29 @@
       <p id="q2SubmittedAnswer" class="submitted hidden"></p>
     </section>
 
-    <section id="questionLast" class="card last-card game-question hidden">
+    <section id="questionLast" class="card last-card game-question">
       <div class="question-header">
-        <h1 class="qlabel"><img class="question-number-image" src="images/sideA/q3-label.png" alt="Q3"></h1>
+        <h1 class="qlabel"><img class="question-number-image" src="images/sideA/q1-label.png" alt="Q1"></h1>
         <button id="q3NoticeButton" class="notice-link" type="button">気づく</button>
       </div>
 
-      <div id="zodiacStage" class="zodiac-stage" aria-label="動き回る十二支の動物"></div>
+      <div class="q1-stage-meta"><span id="q1StageStatus" class="q1-stage-status">1 / 3</span></div>
+      <div id="zodiacStage" class="zodiac-stage q1-challenge-stage" aria-label="動き回るイラスト">
+        <p id="q1StagePrompt" class="q1-stage-prompt">同じ動物は？</p>
+      </div>
       <div class="round-timer">
         <progress id="roundProgress" max="60" value="60"></progress>
         <span id="roundTimeText">残り 1:00</span>
       </div>
-
-      <div class="kana-key" aria-label="数字とひらがなの対応">
-        <div class="kana-pair"><span>1</span><span>い</span></div>
-        <div class="kana-pair"><span>2</span><span>う</span></div>
-        <div class="kana-pair"><span>3</span><span>く</span></div>
-        <div class="kana-pair"><span>4</span><span>し</span></div>
-        <div class="kana-pair"><span>5</span><span>す</span></div>
-        <div class="kana-pair"><span>6</span><span>せ</span></div>
-        <div class="kana-pair"><span>7</span><span>そ</span></div>
-        <div class="kana-pair"><span>8</span><span>た</span></div>
-        <div class="kana-pair"><span>9</span><span>と</span></div>
-        <div class="kana-pair"><span>10</span><span>ふ</span></div>
-        <div class="kana-pair"><span>11</span><span>ろ</span></div>
-        <div class="kana-pair"><span>12</span><span>ん</span></div>
+      <div class="q1-stage-answer">
+        <div class="answerrow">
+          <input id="lastAnswerInput" autocomplete="off" inputmode="text" placeholder="ひらがなで答えを入力" aria-label="Q1の答え">
+          <button id="lastAnswerButton" type="button">決定</button>
+        </div>
+        <p id="lastWrongMessage" class="ng" aria-live="polite"></p>
+        <p id="lastSubmittedAnswer" class="submitted hidden"></p>
+        <div class="resetarea"><button class="progress-reset-button resetlink" type="button">進捗リセット</button></div>
       </div>
-
-      <div id="lastTargets" class="last-targets" aria-label="数える動物"></div>
-      <p id="lastSubmittedAnswer" class="submitted hidden"></p>
     </section>
 
     <section id="questionFinal" class="card final-puzzle-card game-question hidden">
@@ -125,22 +123,26 @@
       </div>
       <p class="spot-difference-label">まちがい</p>
       <div id="spotDifferenceView" class="spot-difference-view">
-        <div id="negiSpotGrid" class="spot-difference-grid flip-card-grid" aria-label="めくれる12枚の画像">
+        <div id="negiSpotGrid" class="spot-difference-grid flip-card-grid" aria-label="めくれる15枚の画像">
           <div class="spot-tile"><img src="images/last/A1.png" alt="A1"></div>
           <div class="spot-tile"><img src="images/last/A2.png" alt="A2"></div>
           <div class="spot-tile"><img src="images/last/A3.png" alt="A3"></div>
           <div class="spot-tile"><img src="images/last/A4.png" alt="A4"></div>
+          <div class="spot-tile"><img src="images/last/A5.png" alt="A5"></div>
           <div class="spot-tile"><img src="images/last/B1.png" alt="B1"></div>
           <div class="spot-tile"><img src="images/last/B2.png" alt="B2"></div>
           <div class="spot-tile"><img src="images/last/B3.png" alt="B3"></div>
           <div class="spot-tile"><img src="images/last/B4.png" alt="B4"></div>
+          <div class="spot-tile"><img src="images/last/B5.png" alt="B5"></div>
           <div class="spot-tile"><img src="images/last/C1.png" alt="C1"></div>
           <div class="spot-tile"><img src="images/last/C2.png" alt="C2"></div>
           <div class="spot-tile"><img src="images/last/C3.png" alt="C3"></div>
           <div class="spot-tile"><img src="images/last/C4.png" alt="C4"></div>
+          <div class="spot-tile"><img src="images/last/C5.png" alt="C5"></div>
         </div>
         <button id="spotFullscreenClose" class="spot-fullscreen-close" type="button" aria-label="拡大表示を閉じる">×</button>
       </div>
+      <p id="finalLengthHint" class="final-length-hint" aria-live="polite"></p>
       <button id="spotFullscreenButton" class="spot-fullscreen-button" type="button">拡大</button>
     </section>
 
@@ -155,10 +157,10 @@
       <button id="nextQuestionButton" type="button" aria-label="次の問題" disabled>▶</button>
     </nav>
 
-    <section id="q1AnswerCard" class="card answer">
+    <section id="q1AnswerCard" class="card answer hidden">
       <h2>こたえ</h2>
       <div class="answerrow">
-        <input id="answerInput" autocomplete="off" placeholder="答えを入力" aria-label="答え">
+        <input id="answerInput" autocomplete="off" placeholder="答えを入力" aria-label="Q2の答え">
         <button id="answerButton" type="button">決定</button>
       </div>
       <p id="wrongMessage" class="ng" aria-live="polite"></p>
@@ -168,20 +170,10 @@
     <section id="q2AnswerCard" class="card answer hidden">
       <h2>こたえ</h2>
       <div class="answerrow">
-        <input id="q2AnswerInput" autocomplete="off" placeholder="答えを入力" aria-label="Q2の答え">
+        <input id="q2AnswerInput" autocomplete="off" placeholder="答えを入力" aria-label="Q3の答え">
         <button id="q2AnswerButton" type="button">決定</button>
       </div>
       <p id="q2WrongMessage" class="ng" aria-live="polite"></p>
-      <div class="resetarea"><button class="progress-reset-button resetlink" type="button">進捗リセット</button></div>
-    </section>
-
-    <section id="lastAnswerCard" class="card answer hidden">
-      <h2>こたえ</h2>
-      <div class="answerrow">
-        <input id="lastAnswerInput" autocomplete="off" placeholder="答えを入力" aria-label="Q3の答え">
-        <button id="lastAnswerButton" type="button">決定</button>
-      </div>
-      <p id="lastWrongMessage" class="ng" aria-live="polite"></p>
       <div class="resetarea"><button class="progress-reset-button resetlink" type="button">進捗リセット</button></div>
     </section>
 
