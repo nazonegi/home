@@ -315,21 +315,20 @@
     };
     const notices = [...(noticeConfig.sideB?.[question] || fallbacks[question] || [])];
     const outcome = getLinkedOutcome();
+    const thirdQ1Answer = lastModel?.stage3?.answer || "";
+    const q1HintAnswer = question === "q1" ? thirdQ1Answer : q3Answer;
+    const q2HintAnswer = question === "q2" ? q2Model?.answer : q2SolvedAnswer;
+    const differenceHint = window.Team1Last?.getFinalDifferenceHints(outcome)
+      .map(item => `「${item.label}」`).join("、") || "？";
     notices.forEach((notice, noticeIndex) => {
       if (notice.type !== "text") return;
       notices[noticeIndex] = { ...notice, content: notice.content
-        .split("{{Q1_ANSWER}}").join(q3Answer || "？")
-        .split("{{Q2_ANSWER}}").join(q2SolvedAnswer || "？")
+        .split("{{Q1_ANSWER}}").join(q1HintAnswer || "？")
+        .split("{{Q2_ANSWER}}").join(q2HintAnswer || "？")
         .split("{{Q3_ANSWER}}").join(outcome?.q3Answer || "？")
+        .split("{{LAST_DIFFERENCES}}").join(differenceHint)
         .split("{{LAST_ANSWER}}").join(outcome?.finalAnswer || "？") };
     });
-    if (question === "q1") {
-      const currentAnswer = lastModel?.[`stage${q1RoundStage + 1}`]?.answer;
-      if (currentAnswer) notices.push({ type: "text", content: `現在のQ1の答えは「${currentAnswer}」` });
-    }
-    if (question === "last" && finalRule?.answer) {
-      notices.push({ type: "text", content: `現在のLASTの答えは「${finalRule.answer}」` });
-    }
     if (!notices.length) return;
     const safeIndex = Math.max(0, Math.min(index, notices.length - 1));
     const notice = notices[safeIndex];

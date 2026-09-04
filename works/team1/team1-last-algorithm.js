@@ -83,6 +83,20 @@
     { q2: "くーる", q1: "ぎもんふ", q3: "げんかん", final: "ふくげん", parts: { q2: "く", q1: "ふん", q3: "げ" } },
     { q2: "くーる", q1: "くてん", q3: "かいだん", final: "かくてい", parts: { q2: "く", q1: "て", q3: "かい" } }
   ];
+
+  const finalDifferenceLabels = {
+    A1: "木のりんご",
+    A2: "青い鳥の向き",
+    A4: "風船",
+    B1: "ベンチ",
+    B2: "なぞねぎの鼻",
+    B3: "赤いボール",
+    B4: "なぞなすの鼻",
+    C1: "花壇のテントウムシ",
+    C2: "花壇のトンボ",
+    C3: "紫の花",
+    C4: "なぞなすの足元のあおむし"
+  };
   const q2DotLetters = {
     C: [1, 1, 1, 1, 0, 0, 1, 1, 1], I: [0, 1, 0, 0, 1, 0, 0, 1, 0],
     T: [1, 1, 1, 0, 1, 0, 0, 1, 0], Y: [1, 0, 1, 0, 1, 0, 0, 1, 0],
@@ -250,5 +264,14 @@
     };
   }
 
-  window.Team1Last = { animals, animalNames, q1Homophones, q1Marks, q2Runners, q2Answers, linkedAnswers, hash, randomFrom, createQ1, createQ2, createLinkedOutcome };
+  function getFinalDifferenceHints(outcome) {
+    if (!outcome) return [];
+    const rowForSource = { q2: "A", q3: "B", q1: "C" };
+    return outcome.selected
+      .map(item => `${rowForSource[item.source]}${item.position}`)
+      .sort((left, right) => left.localeCompare(right, "en", { numeric: true }))
+      .map(coordinate => ({ coordinate, label: finalDifferenceLabels[coordinate] || coordinate }));
+  }
+
+  window.Team1Last = { animals, animalNames, q1Homophones, q1Marks, q2Runners, q2Answers, linkedAnswers, finalDifferenceLabels, hash, randomFrom, createQ1, createQ2, createLinkedOutcome, getFinalDifferenceHints };
 })();
