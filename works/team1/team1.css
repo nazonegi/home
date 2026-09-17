@@ -194,6 +194,7 @@ input {
 .letter-cell:hover { background: #eee; }
 .letter-cell.is-black,
 .letter-cell.is-black:hover { border-color: #111; background: #111; color: #111; }
+.side-b .letter-cell.is-light-glyph { font-weight: 400; }
 .letter-cell:focus-visible { position: relative; z-index: 2; outline: 4px solid #d8b36d; outline-offset: -4px; }
 .letter-cell.is-black:focus-visible { outline-color: #111; }
 
@@ -417,6 +418,11 @@ input {
   border-left: clamp(30px, 9vw, 42px) solid transparent;
   transform-origin: 50% 60%;
   pointer-events: none;
+  transition: border-bottom-color 80ms ease;
+}
+
+.maze-controller button:active .direction-triangle {
+  border-bottom-color: #b8b8b8;
 }
 
 .maze-controller [data-move="right"] .direction-triangle { transform: rotate(90deg); }

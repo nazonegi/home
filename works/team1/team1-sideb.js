@@ -156,8 +156,10 @@
       const index = Number(button.dataset.index);
       if (q2Model) {
         const side = q2Model.sideB;
-        button.textContent = side.letters[index] || "";
-        button.setAttribute("aria-label", `${side.letters[index] || ""}のマス`);
+        const letter = side.letters[index] || "";
+        button.textContent = letter;
+        button.classList.toggle("is-light-glyph", letter === "め");
+        button.setAttribute("aria-label", `${letter}のマス`);
       }
       const active = selected.has(index);
       button.classList.toggle("is-black", active);
