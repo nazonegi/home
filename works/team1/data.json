@@ -3,8 +3,8 @@
   "id": "team1",
   "title": "協力しないと出られない部屋からの脱出",
   "author": "なぞねぎ",
-  "difficulty": 3,
-  "time": "45〜60分",
+  "difficulty": 4,
+  "time": "60〜120分",
   "titleImage": "title.png",
   "gameType": "two-player-cooperative",
   "sides": {
