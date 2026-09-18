@@ -158,7 +158,6 @@
         const side = q2Model.sideB;
         const letter = side.letters[index] || "";
         button.textContent = letter;
-        button.classList.toggle("is-light-glyph", letter === "め");
         button.setAttribute("aria-label", `${letter}のマス`);
       }
       const active = selected.has(index);
